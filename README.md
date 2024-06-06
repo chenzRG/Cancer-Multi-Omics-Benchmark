@@ -1,1 +1,1 @@
-# Cancer-Multi-Omics-Benchmark-CMOB-
+# Cancer-Multi-Omics-Benchmark (CMOB)
