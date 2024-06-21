@@ -18,7 +18,8 @@
 ![GitHub](https://img.shields.io/github/license/) -->
 
 
-- [*CMOB*: Large-Scale Cancer Multi-Omics Benchmark with Open Datasets, Tasks, and Baselines](#CMOB: Large-Scale Cancer Multi-Omics Benchmark with Open Datasets, Tasks, and Baselines)
+- [CMOB: Large-Scale Cancer Multi-Omics Benchmark with Open Datasets, Tasks, and Baselines](#cmob-large-scale-cancer-multi-omics-benchmark-with-open-datasets-tasks-and-baselines)
+
   - [Installations](#installations)
   - [Usage \& Examples](#usage--examples)
   - [Datasets](#datasets)
