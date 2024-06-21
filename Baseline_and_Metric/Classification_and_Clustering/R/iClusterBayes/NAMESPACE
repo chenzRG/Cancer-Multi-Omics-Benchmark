@@ -1,0 +1,7 @@
+useDynLib(iClusterPlus)
+importFrom("parallel","mclapply")
+importFrom("grDevices", "gray")
+importFrom("graphics", "axis", "box", "image", "mtext", "plot")
+importFrom("stats", "as.dist", "cor", "dist", "hclust", "kmeans","model.matrix", "quantile", "rnorm", "sd")
+importFrom("utils", "data", "tail")
+export(compute.pod,plotiCluster,iCluster,iCluster2,tune.iCluster2,iClusterPlus,tune.iClusterPlus,plotHeatmap,getBIC,getDevR,getClusters,CNregions,iClusterBayes,tune.iClusterBayes,plotHMBayes,iManual)

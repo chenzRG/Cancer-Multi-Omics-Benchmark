@@ -1,0 +1,312 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{mogsa: gene set analysis on multiple omics data}
+
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{times}
+%\usepackage{hyperref}
+\usepackage[numbers]{natbib}
+\usepackage{graphicx}
+<<style, eval=TRUE, echo=FALSE, results='asis'>>=
+BiocStyle::latex(bibstyle="unsrt")
+# BiocStyle::latex()
+@
+
+\title{\Biocpkg{mogsa}: gene set analysis on multiple omics data}
+\author{Chen Meng}
+\date{Modified: January 19, 2016.  Compiled: \today.}
+
+\begin{document}
+
+<<include=FALSE>>=
+library(knitr)
+opts_chunk$set(
+concordance=TRUE
+)
+@
+
+% \SweaveOpts{concordance=TRUE}
+
+<<include=FALSE>>=
+library(knitr)
+opts_chunk$set(
+concordance=TRUE, cache=TRUE, message=FALSE, out.width=".55\\textwidth", echo=TRUE, fig.width=6, fig.height=6, fig.align="center", result="markup", hold=TRUE
+)
+@
+
+% \SweaveOpts{concordance=TRUE}
+
+\maketitle
+
+\tableofcontents
+
+\section{MOGSA overview}
+
+Modern "omics" technologies enable quantitative monitoring of the abundance of various biological molecules 
+in a high-throughput manner, accumulating an unprecedented amount of quantitative information on a genomic 
+scale. Gene set analysis is a particularly useful method in high throughput data analysis since it can 
+summarize single gene level information into the biological informative gene set levels. The \Biocpkg{mogsa}
+provide a method doing gene set analysis based on multiple omics data that describes the same set of 
+observations/samples.
+
+MOGSA algorithm consists of three steps. In the first step, multiple omics data are integrated using multi-table 
+multivariate analysis, such as multiple factorial analysis (MFA) \cite{abdimfa}. MFA projects the observations 
+and variables (genes) from each dataset onto a lower dimensional space, resulting in sample scores (or PCs) and 
+variables loadings respectively. Next, gene set annotations are projected as additional information onto the same space, 
+generating a set of scores for each gene set across samples \cite{tayracmfa}. 
+In the final step, MOGSA generates a gene set score (GSS) matrix by reconstructing the sample scores and 
+gene set scores.
+A high GSS indicates that gene set and the variables in that gene set have measurement in one or more dataset that explain a large proportion of the correlated information across data tables. Variables (genes) unique to individual datasets or common among matrices may contribute to a high GSS. For example, in a gene set, a few genes may have high levels of gene expression, others may have increased protein levels and a few may have amplifications in copy number. 
+
+In this document, we show with an example how to use MOGSA to integrate and annotate multiple omics data.
+
+\section{Run mogsa}
+\subsection{Quick start}
+In this working example, we will analyze the NCI-60 transcriptomic data from 4 different microarray platforms. The goal is 
+to explore which functions (gene sets) are associated with (high or low expressed) which type of tumor. 
+First, load the library and data
+
+<<loadLib>>=
+# loading gene expression data and supplementary data
+library(mogsa)
+library(gplots) # used for visulizing heatmap
+# loading gene expression data and supplementary data
+data(NCI60_4array_supdata)
+data(NCI60_4arrays)
+@
+
+\Robject{NCI60\_4arrays} is a \Rclass{list} of \Rclass{data.frame}. The \Rclass{list} consists of 
+microarray data for NCI-60 cell lines from different platforms. In each of the \Rclass{data.frame},
+columns are the 60 cell lines and rows are genes. The data was downloaded from \cite{cellminer},
+but only a small subset of genes were selected. Therefore, the result in 
+this vignette is not intended for biological interpretation.
+
+\Robject{NCI60\_4array\_supdata} is a \Rclass{list} of \Rclass{matrix}, representing gene set annotation data.
+For each of the microarray data, there is a corresponding annotation matrix. 
+In the annotation data, the rows are genes (in the same order as their original dataset) and columns 
+are gene sets. 
+An annotation matrix is a binary matrix, where 1 indicates a gene is present in a gene set and 0 otherwise.
+See the "Preparation of gene set data" section about how to create the gene set annotation 
+matrices as required by \Rfunction{mogsa}. To have an overview of the two datasets:
+
+<<dataDim>>=
+sapply(NCI60_4arrays, dim) # check dimensions of expression data
+sapply(NCI60_4array_supdata, dim) # check dimensions of supplementary data
+# check if the gene expression data and annotation data are mathced in the same order
+identical(names(NCI60_4arrays), names(NCI60_4array_supdata)) 
+head(rownames(NCI60_4arrays$agilent)) # the type of gene IDs
+@
+
+Also, we need to confirm the columns between the expression data and annotation data
+are mapped in the same order. To verify this, we do
+<<dataColMatch>>=
+dataColNames <- lapply(NCI60_4arrays, colnames)
+supColNames <- lapply(NCI60_4arrays, colnames)
+identical(dataColNames, supColNames)
+@
+
+Before applying MOGSA, we first define a factor describing the tissue of origin of cell lines and color code, which 
+will be used later.
+<<defineCancerType>>=
+# define cancer type
+cancerType <- as.factor(substr(colnames(NCI60_4arrays$agilent), 1, 2))
+# define color code to distinguish cancer types
+colcode <- cancerType
+levels(colcode) <- c("black", "red", "green", "blue", 
+                     "cyan", "brown", "pink", "gray", "orange")
+colcode <- as.character(colcode)
+@ 
+
+Then, we call the function \Rfunction{mogsa} to run MOGSA:
+<<mogsaBasicRun>>=
+mgsa1 <- mogsa(x = NCI60_4arrays, sup=NCI60_4array_supdata, nf=3,
+               proc.row = "center_ssq1", w.data = "inertia", statis = TRUE)
+@
+In this function, the input argument \Rcode{proc.row} stands for the preprocessing of rows and argument \Rcode{w.data}
+indicates the weight of datasets. The last argument \Rcode{statis} is about which multiple table
+analysis method should be used. Two multivariate methods are available at present, 
+one is "STATIS" (\Rcode{statis=TRUE}) \cite{abdistatis}, 
+the other one is multiple factorial analysis (MFA; \Rcode{statis=FALSE, the default setting}) \cite{abdimfa}. 
+
+In this analysis, we arbitrarily selected top three PCs (nf=3). But in practice, 
+the number of PCs need to be determined before running the MOGSA. 
+Therefore, it is also possible to run the multivariate analysis and projecting annotation data separately. After 
+running the multivariate analysis, a scree plot of eigenvalues for each PC could be used to determine
+the proper number of PCs to be included in the annotation projection step 
+(See the "Perform MOGSA in two steps" section).
+
+\subsection{Result analysis and interpretation}
+
+The function \Rfunction{mogsa} returns an object of class \Rclass{mgsa}. This information could be 
+extracted with function \Rfunction{getmgsa}. First, we want to know the variance explained by each PC 
+on different datasets (figure 1). 
+<<eigenPlot, fig.cap="The variance of each principal components (PC), the contributions of different data are distinguished by different colors", fig.width=4, fig.height=4>>=
+eigs <- getmgsa(mgsa1, "partial.eig") # get partial "eigenvalue" for separate data 
+barplot(as.matrix(eigs), legend.text = rownames(eigs))
+@
+
+
+The main result returned by \Rfunction{mogsa} is the gene set score (GSS) matrix. The value in the matrix indicates the 
+overall active level of a gene set in a sample. The matrix could be extracted and visualized by
+<<scoreMatrix, fig.cap="heatmap showing the gene set score (GSS) matrix">>=
+# get the score matrix
+scores <- getmgsa(mgsa1, "score")
+heatmap.2(scores, trace = "n", scale = "r", Colv = NULL, dendrogram = "row", 
+          margins = c(6, 10), ColSideColors=colcode)
+@
+
+Figure 2 shows the gene set score matrix returned by \Rfunction{mogsa}.
+The rows of the matrix are all the gene sets used to annotate the data. But we are mostly interested
+in the gene sets with large number of significant gene sets, because these gene sets describe the 
+difference across cell lines. The corresponding p-value for each gene set score could be extracted
+by \Rfunction{getmgsa}. Then, the most significant gene sets could be defined as gene sets that contain 
+highest number of significantly p-values. For example, if we want to select the top 20 
+most significant gene sets and plot them in heatmap, we do:
+<<subsetScoreMatrix, fig.cap="heatmap showing the gene set score (GSS) matrix for top 20 significant gene sets">>=
+p.mat <- getmgsa(mgsa1, "p.val") # get p value matrix
+# select gene sets with most signficant GSS scores.
+top.gs <- sort(rowSums(p.mat < 0.01), decreasing = TRUE)[1:20]
+top.gs.name <- names(top.gs)
+top.gs.name
+heatmap.2(scores[top.gs.name, ], trace = "n", scale = "r", Colv = NULL, dendrogram = "row",
+          margins = c(6, 10), ColSideColors=colcode)
+@
+The result is shown in figure 3. We can see that these gene sets reflect the difference
+between leukemia and other tumors. 
+
+So far, we already had an integrative overview of gene sets active levels over the 60 cell lines.
+It is also interesting to look into more detailed information for a specific gene set. 
+For example, which dataset(s) contribute most to the high or low gene set score of a gene set? 
+And which genes are most important in defining the gene set score for a gene set?
+The former question could be answered by the gene set score decomposition; 
+the later question could be solve by the gene influential score. These analysis can be done with 
+\Rfunction{decompose.gs.group} and \Rfunction{GIS}.
+
+In the first example, we explore the gene set that have most significant gene set scores. The 
+gene set is
+<<decompGis1_1>>=
+# gene set score decomposition
+# we explore two gene sets, the first one
+gs1 <- top.gs.name[1] # select the most significant gene set
+gs1
+@
+
+The data-wise decomposition of this gene set over cancer types is 
+<<decompGis1_dc, fig.cap="gene set score (GSS) decomposition. The GSS decomposition are grouped according to the tissue of origin of cell lines. The vertical bar showing the 95\\% of confidence interval of the means.">>=
+# decompose the gene set score over datasets
+decompose.gs.group(mgsa1, gs1, group = cancerType) 
+@
+Figure 4 shows leukemia cell lines have lowest GSS on this gene set.
+The contribution to the overall gene set score by each dataset are separated in this plot.
+In general, there is a good concordance between different datasets. But HGU133 platform
+contribute most and Agilent platform contributed least comparing with other datasets, represented as
+the longest or shortest bars.
+
+Next, in order to know the most influential genes in this gene set. We call the function \Rfunction{GIS}:
+<<decompGis1_gis, fig.cap="The gene influential score (GIS) plot. the GIS are represented as bars and the original data where the gene is from is distingished by different colors.">>=
+gis1 <- GIS(mgsa1, gs1, barcol = gray.colors(4)) # gene influential score
+head(gis1) # print top 6 influencers
+@
+In figure 5, the bars represent the gene influential scores for genes. Genes from different platforms are 
+shown in different colors. The expression of genes with high positive GIS more likely to have a 
+good positive correlation with the gene set score. In this example, the most important genes in the gene set
+"PASIN SUZ12 TARGETS DN" are TNFRSF12A (identified in two different platforms), CD151, ITGB1, etc.
+
+
+In the next example, we use the same methods to explore the "PUJANA ATM PCC NETWORK" gene set.
+<<decompGis2, fig.cap=c("Data-wise decomposed GSS for gene set 'PUJANA ATM PCC NETWORK'", "GIS plot for gene set 'PUJANA ATM PCC NETWORK'")>>=
+# the section gene set
+gs2 <- "PUJANA_ATM_PCC_NETWORK"
+decompose.gs.group(mgsa1, gs2, group = cancerType, x.legend = "topright")
+gis2 <- GIS(mgsa1, "PUJANA_ATM_PCC_NETWORK", topN = 6, barcol = gray.colors(4))
+gis2
+@
+Figure 6 shows that the the leukemia cell lines have highest GSSs for this gene set. And the HGU133 and HGU95 
+platform have relative high contribution to the overall gene set score.
+The GIS analysis (figure 7) indicates the PIK4CG and GMFG are the 
+most important genes in this gene set.
+
+\subsection{Plot gene sets in projected space}
+We can also see how the gene set are presented in the lower dimension space. Here 
+we show the projection of gene set annotations on first two dimensions.
+Then, the label the two gene sets we analyzed before. 
+<<gsSpace, fig.width=".8\\\\textwidth", fig.cap="cell line and gene sets projected on the PC1 and PC2">>=
+fs <- getmgsa(mgsa1, "fac.scr") # extract the factor scores for cell lines (cell line space)
+layout(matrix(1:2, 1, 2))
+plot(fs[, 1:2], pch=20, col=colcode, axes = FALSE)
+abline(v=0, h=0)
+legend("topright", col=unique(colcode), pch=20, legend=unique(cancerType), bty = "n")
+plotGS(mgsa1, label.cex = 0.8, center.only = TRUE, topN = 0, label = c(gs1, gs2))
+@
+
+
+\subsection{Perform MOGSA in two steps}
+
+\Rfunction{mogsa} perform MOGSA in one step. But in practice, one need to determine how many PCs should be 
+retained in the step of reconstructing gene set score matrix. 
+A scree plot of the eigenvalues, which result from the multivariate analysis, could be used for this purpose. 
+Therefore, we can perform the multivariate data analysis and gene set annotation projection in two steps. 
+To do the multivariate analysis, we call the \Rfunction{moa}:
+<<moa, fig.width=6, fig.cap="cell line and gene sets projected on the PC1 and PC2">>=
+# perform multivariate analysis
+ana <- moa(NCI60_4arrays, proc.row = "center_ssq1", w.data = "inertia", statis = TRUE)
+slot(ana, "partial.eig")[, 1:6] # extract the eigenvalue
+# show the eigenvalues in scree plot:
+layout(matrix(1:2, 1, 2)) 
+plot(ana, value="eig", type = 2, n=20, main="variance of PCs") # use '?"moa-class"' to check the help manu
+plot(ana, value="tau", type = 2, n=20, main="Scaled variance of PCs")
+@
+
+The multivariate analysis (\Rfunction{moa}) returns an object of class \Rclass{moa-class}. 
+The scree plot shows the top 3 PC is the most significant since they explain much more variance than others.
+Several other methods, such as the informal "elbow test" or more formal test could be used to determine the 
+number of retained PCs \cite{abdipca}.
+In order to be consistent with previous example, we use top 3 PCs in the analysis:
+<<moasup>>=
+mgsa2 <- mogsa(x = ana, sup=NCI60_4array_supdata, nf=3)
+identical(mgsa1, mgsa2) # check if the two methods give the same results
+@
+
+
+\section{Preparation of gene set data}
+
+Package \Biocpkg{GSEABase} provides several methods to create a gene set list \cite{gseabase}. In \Biocpkg{mogsa} 
+there are two methods to create gene set list. The first one is generating gene set 
+list from package \Biocpkg{graphite} \cite{graphite} using function \Rfunction{prepGraphite}. 
+<<prepGraphite>>=
+library(graphite)
+keggdb <- prepGraphite(db = pathways("hsapiens", "kegg")[1:50], id = "symbol")
+keggdb <- lapply(keggdb, function(x) sub("SYMBOL:", "", x))
+keggdb[1:2]
+@ 
+
+The second method is to create a gene set list from "gmt" files, which could be downloaded from MSigDB \cite{msigdb}
+after obtaining a proper license. In our working example, we will work on a toy example from this database containing 
+only three datasets.
+<<prepMsigDB>>=
+dir <- system.file(package = "mogsa")
+preGS <- prepMsigDB(file=paste(dir, "/extdata/example_msigdb_data.gmt.gz", sep = ""))
+@ 
+
+In order to use the gene set information in \Rfunction{mogsa}, we have to convert the list of gene sets to
+a list of annotation matrix. This can be done with \Rfunction{prepSupMoa}. This function requires two obligatory 
+inputs, first is the multiple omics datasets and the second input could be a gene set list, \Rclass{GeneSet}
+or \Rclass{GeneSetCollection}. The output of \Rfunction{prepSupMoa} could be 
+directly passed into the \Rfunction{mogsa}.
+
+<<prepInput>>=
+# the prepare
+sup_data1 <- prepSupMoa(NCI60_4arrays, geneSets=keggdb, minMatch = 1)
+mgsa3 <- mogsa(x = NCI60_4arrays, sup=sup_data1, nf=3,
+               proc.row = "center_ssq1", w.data = "inertia", statis = TRUE)
+@ 
+
+\section{Session info}
+
+<<sessionInfo, results = 'asis', eval = TRUE, echo = TRUE>>=
+toLatex(sessionInfo())
+@
+
+\bibliography{mogsa}
+\end{document}

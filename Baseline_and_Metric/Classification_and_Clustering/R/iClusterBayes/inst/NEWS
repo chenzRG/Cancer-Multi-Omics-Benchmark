@@ -1,0 +1,5 @@
+iClusterPlus was first submitted to Bioconductor in March 2013
+iClusterPlus was re-submitted to Bioconductor in November 2013
+iClusterBayes was added to Bioconductor in April 2018
+Fix compiling errors caused by R 4.3.x, related to argument FCLEN in BLAS and Lapack routines. February 2023
+

@@ -1,0 +1,2 @@
+BiocGenerics:::testPackage("iClusterPlus")
+

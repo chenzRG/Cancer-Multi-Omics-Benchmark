@@ -1,0 +1,19 @@
+dat_name: "BRCA"
+root: "/mnt/data1/share_data/TCGA/SubtypeGAN/${dataset.dat_name}"
+csvfn:
+  meth: "meth.csv"
+  rna: "rna.csv"
+  CN: "CN.csv"
+  miRNA: "miRNA.csv"
+  cli: "clinic.csv"
+n_clusters:
+  BRCA: 5
+  BLCA: 5
+  KIRC: 4
+  GBM: 3
+  LUAD: 3
+  PAAD: 2
+  SKCM: 4
+  STAD: 3
+  UCEC: 4
+  UVM: 4

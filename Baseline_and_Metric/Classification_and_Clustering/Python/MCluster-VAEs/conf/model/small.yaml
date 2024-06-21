@@ -1,0 +1,23 @@
+omic_cls_hiddens:  []
+omic_cls_latents: 100
+global_hiddens: []
+att_method: "gate"
+att_kwargs:
+  use_tanh: false
+  attention_score_method: "sigmoid"
+add_bn_after_att: true
+gumbel_reparam: true
+y_gen: true
+
+omic_enc_hiddens: [250]
+omic_n_latents:
+  rna: 100
+  CN: 100
+  meth: 100
+  miRNA: 30
+omic_dec_hiddens: [100]
+omic_enc_inject: true
+omic_dec_inject: false
+prior_kind: "uniform"  # [0.9, 0.1]
+bn: true
+dp: null

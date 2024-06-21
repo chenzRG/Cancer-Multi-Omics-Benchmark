@@ -1,0 +1,110 @@
+
+BCRA:
+rate 0.7
+rmse: 0.119, mae: 0.0919
+rmse: 0.109, mae: 0.0809
+rmse: 0.106, mae: 0.0789
+rmse: 0.099, mae: 0.0746
+rmse: 0.104, mae: 0.0757
+
+rate 0.5
+rmse: 0.119, mae: 0.092
+rmse: 0.103, mae: 0.0753
+rmse: 0.0898, mae: 0.0661
+rmse: 0.09, mae: 0.0671
+rmse: 0.0859, mae: 0.0626
+
+rate 0.3
+rmse: 0.119, mae: 0.092
+rmse: 0.0992, mae: 0.0726
+rmse: 0.0843, mae: 0.0617
+rmse: 0.0875, mae: 0.0651
+rmse: 0.0799, mae: 0.0577
+
+COAD:
+rate 0.7:
+rmse: 0.101, mae: 0.0773
+rmse: 0.0994, mae: 0.0734
+rmse: 0.0925, mae: 0.0683
+rmse: 0.0894, mae: 0.0672
+rmse: 0.0937, mae: 0.0685
+
+rate 0.5:
+rmse: 0.101, mae: 0.0773
+rmse: 0.0905, mae: 0.066
+rmse: 0.0792, mae: 0.0583
+rmse: 0.0767, mae: 0.0568
+rmse: 0.0759, mae: 0.0552
+
+rate 0.3:
+rmse: 0.102, mae: 0.0774
+rmse: 0.0864, mae: 0.0625
+rmse: 0.0759, mae: 0.0556
+rmse: 0.072, mae: 0.0527
+rmse: 0.0711, mae: 0.0511
+
+GBM:
+rate 0.7:
+rmse: 0.122, mae: 0.0955
+rmse: 0.106, mae: 0.0803
+rmse: 0.0973, mae: 0.0727
+rmse: 0.0964, mae: 0.0735
+rmse: 0.11, mae: 0.0835
+
+rate 0.5:
+rmse: 0.122, mae: 0.0955
+rmse: 0.0966, mae: 0.0725
+rmse: 0.0838, mae: 0.0625
+rmse: 0.0842, mae: 0.0634
+rmse: 0.0821, mae: 0.0614
+
+rate 0.3:
+rmse: 0.122, mae: 0.0955
+rmse: 0.0929, mae: 0.0696
+rmse: 0.0801, mae: 0.0596
+rmse: 0.0832, mae: 0.0622
+rmse: 0.0777, mae: 0.0577
+
+LGG:
+rate 0.7:
+rmse: 0.131, mae: 0.104
+rmse: 0.109, mae: 0.0834
+rmse: 0.0949, mae: 0.0716
+rmse: 0.0965, mae: 0.0742
+rmse: 0.153, mae: 0.124
+
+rate 0.5:
+rmse: 0.131, mae: 0.103
+rmse: 0.0979, mae: 0.0743
+rmse: 0.0818, mae: 0.0613
+rmse: 0.0809, mae: 0.0611
+rmse: 0.0821, mae: 0.0624
+
+rate 0.3:
+rmse: 0.131, mae: 0.103
+rmse: 0.0937, mae: 0.071
+rmse: 0.0782, mae: 0.0584
+rmse: 0.0764, mae: 0.057
+rmse: 0.0741, mae: 0.0555
+
+OV:
+rate 0.7:
+rmse: 0.124, mae: 0.0976
+rmse: 0.122, mae: 0.0944
+rmse: 0.118, mae: 0.0908
+rmse: 0.112, mae: 0.0875
+rmse: 0.161, mae: 0.13
+
+rate 0.5:
+rmse: 0.124, mae: 0.0976
+rmse: 0.109, mae: 0.0833
+rmse: 0.102, mae: 0.0783
+rmse: 0.0977, mae: 0.0753
+rmse: 0.1, mae: 0.0775
+
+rate 0.3:
+rmse: 0.124, mae: 0.0975
+rmse: 0.103, mae: 0.0784
+rmse: 0.0978, mae: 0.075
+rmse: 0.0927, mae: 0.071
+rmse: 0.0904, mae: 0.0692

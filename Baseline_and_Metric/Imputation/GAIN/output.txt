@@ -1,0 +1,46 @@
+
+
+RMSE Performance: 0.1165
+MAE Performance: 0.0889
+
+RMSE Performance: 0.114
+MAE Performance: 0.087
+
+RMSE Performance: 0.112
+MAE Performance: 0.0852
+
+RMSE Performance: 0.1037
+MAE Performance: 0.079
+
+RMSE Performance: 0.1029
+MAE Performance: 0.0786
+
+RMSE Performance: 0.1026
+MAE Performance: 0.0783
+
+RMSE Performance: 0.1217
+MAE Performance: 0.0948
+
+RMSE Performance: 0.1145
+MAE Performance: 0.0888
+
+RMSE Performance: 0.114
+MAE Performance: 0.0883
+
+RMSE Performance: 0.1322
+MAE Performance: 0.1043
+
+RMSE Performance: 0.1291
+MAE Performance: 0.1018
+
+RMSE Performance: 0.123
+MAE Performance: 0.0966
+
+RMSE Performance: 0.1263
+MAE Performance: 0.0994
+
+RMSE Performance: 0.1252
+MAE Performance: 0.0984
+
+RMSE Performance: 0.124
+MAE Performance: 0.0974

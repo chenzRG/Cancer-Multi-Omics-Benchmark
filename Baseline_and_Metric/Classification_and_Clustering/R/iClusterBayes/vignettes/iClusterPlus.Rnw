@@ -1,0 +1,65 @@
+%\VignetteIndexEntry{iClusterPlus}
+%\VignetteDepends{}
+%\VignetteKeywords{Integrative clustering, multiple genomic data}
+%\VignettePackage{iClusterPlus}
+
+\documentclass[11pt]{article}
+\usepackage{amsmath}
+\usepackage[authoryear,round]{natbib}
+\usepackage{hyperref}
+\usepackage[utf8]{inputenc}
+\SweaveOpts{echo=FALSE}
+
+\setlength{\textheight}{8.5in}
+\setlength{\textwidth}{6in}
+\setlength{\topmargin}{-0.25in}
+\setlength{\oddsidemargin}{0.25in}
+\setlength{\evensidemargin}{0.25in}
+
+\begin{document}
+\setkeys{Gin}{width=0.99\textwidth}
+
+\title{\bf iClusterPlus: integrative clustering of multiple genomic
+  data sets}
+
+\author{Qianxing Mo$^1$ and Ronglai Shen$^2$}
+
+\maketitle
+
+\begin{center}
+$^1$Department of Biostatistics \& Bioinformatics \\
+H. Lee Moffitt Cancer Center \& Research Institute \\
+{\tt qianxing.mo@moffitt.org} \\
+\ \\
+$^2$Deparment of Epidemiology and Biostatistics \\
+Memorial Sloan-Kettering Cancer Center\\
+{\tt shenr@mskcc.org}\\
+\end{center}
+
+\tableofcontents
+
+\section{Introduction}
+Programs iClusterPlus and iClusterBayes are developed for integrative
+clustering analysis of multi-type genomic data, which are significant
+extension of the iCluster program (Shen, Olshen and Ladanyi, 2009). Multi-type genomic data arise from the experiments where biological samples (e.g., tumor
+samples) are analyzed by multiple techniques, for instance, array comparative genomic hybridization (aCGH), gene expression microarray, RNA-seq and DNA-seq, and so on.   
+Examples of these data can be obtained from the Cancer Genome Atlas (TCGA) (\url{http://cancergenome.nih.gov/}).  \\
+
+\noindent
+The iClusterPlus User's guide can be obtained from the Bioconductor web page.
+If you are using Unix/Linux, you can get the manual by typing the following code in R Console.
+\begin{Schunk}
+\begin{Sinput}
+> if (!requireNamespace("BiocManager", quietly=TRUE))
+    > install.packages("BiocManager")
+> BiocManager::install("iClusterPlus")
+> library(iClusterPlus)
+> iManual()
+\end{Sinput}
+\end{Schunk}
+
+\noindent
+In addition, a simulation was performed to test the package.  For
+details, please see the R code in the
+\texttt{iClusterPlus/inst/unitTests/} folder.
+\end{document} 

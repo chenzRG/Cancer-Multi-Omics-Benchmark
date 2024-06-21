@@ -1,0 +1,64 @@
+importFrom("grDevices", "gray.colors", "heat.colors")
+importFrom("graphics", "abline", "barplot", "layout", 
+	"legend", "lines", "matplot", "points", "segments", "text")
+importFrom("stats", "cutree", "dist", "hclust", "heatmap", 
+	"kmeans", "pnorm", "sd")
+importFrom("utils", "head")
+importFrom("stats", "p.adjust")
+
+importFrom("genefilter" , "rowSds")
+importFrom("genefilter" , "rowFtests")
+importFrom("BiocGenerics", "combine")
+importFrom("BiocGenerics", "boxplot")
+importFrom("gplots", "barplot2")
+importFrom("Biobase", "rowMin")
+import("methods")
+import("graphite")
+import("GSEABase")
+
+importFrom("corpcor", "fast.svd")
+importFrom("svd", "propack.svd")
+importFrom("parallel", "mclapply")
+importFrom("cluster", "clusGap", "maxSE")
+
+export(
+	"decompose.gs.ind",
+	"decompose.gs.group",
+	"moa",
+	"box.gs.feature",
+	"mogsa",
+	"pairwise.rv",
+	"prepGraphite",
+	"prepMsigDB",
+	"prepSupMoa",
+	"plotGS",
+	"sup.moa",
+	"wsvd",
+	"annotate.gs",
+	"GIS",
+	"matpower",
+	"getmgsa",
+	
+	"bootMbpca",
+	"distMoa",
+	"moGap",
+	"softK",
+	"mbpca",
+	"moaScore",
+	"moaCoef",
+	"bootMoa"
+)
+
+exportMethods(
+    "plot",
+    "combine", 
+    "show", 
+    "print", 
+    "summary"
+)
+
+exportClasses(
+    "mgsa",
+    "moa",
+    "moa.sup" 
+)

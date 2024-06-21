@@ -1,0 +1,26 @@
+Package: mogsa
+Type: Package
+Title: Multiple omics data integrative clustering and gene set analysis
+Version: 1.38.0
+Date: 2020-06-04
+Author: Chen Meng
+Maintainer: Chen Meng <mengchen18@gmail.com>
+Description: This package provide a method for doing gene set analysis
+        based on multiple omics data.
+License: GPL-2
+Depends: R (>= 3.4.0)
+Imports: methods, graphite, genefilter, BiocGenerics, gplots, GSEABase,
+        Biobase, parallel, corpcor, svd, cluster, grDevices, graphics,
+        stats, utils
+VignetteBuilder: knitr
+Suggests: BiocStyle, knitr, org.Hs.eg.db
+biocViews: GeneExpression, PrincipalComponent, StatisticalMethod,
+        Clustering, Software
+NeedsCompilation: no
+git_url: https://git.bioconductor.org/packages/mogsa
+git_branch: RELEASE_3_19
+git_last_commit: f3d45d4
+git_last_commit_date: 2024-04-30
+Repository: Bioconductor 3.19
+Date/Publication: 2024-04-30
+Packaged: 2024-05-01 04:46:57 UTC; biocbuild

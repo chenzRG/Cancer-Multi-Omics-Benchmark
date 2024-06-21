@@ -1,0 +1,9 @@
+dat_name: "PAN"
+root: "/mnt/data1/share_data/TCGA/PAN2"
+csvfn:
+  meth: "meth.csv"
+  rna: "rna.csv"
+  CN: "CN.csv"
+  miRNA: "miRNA.csv"
+  cli: "clinic.csv"
+n_clusters: 32

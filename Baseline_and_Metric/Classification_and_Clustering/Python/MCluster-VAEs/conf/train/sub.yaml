@@ -1,0 +1,21 @@
+n_epoch: 500
+bs: 32
+lr: 0.0005
+nw: 2
+device: cuda:2
+tensorboard: _datname
+evaluation: 1
+verbose: null
+early_stop:
+  metric: "loss"
+  patience: 10
+  verbose: false
+  delta: 1.0
+lr_sch: true
+optim_method: "adam"
+weight_decay: 0.
+kly_anneal: "cosine"
+kly_anneal_args: {"maxv": 10, "minv": 1}
+rec_anneal: "constant"
+rec_anneal_args: {"minv": 1}
+kl_weight: 1.

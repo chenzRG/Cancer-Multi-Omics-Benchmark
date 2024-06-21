@@ -1,0 +1,139 @@
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{moCluster: Integrative clustering using multiple omics data}
+
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{times}
+%\usepackage{hyperref}
+\usepackage[numbers]{natbib}
+\usepackage{graphicx}
+<<style, eval=TRUE, echo=FALSE, results='asis'>>=
+BiocStyle::latex(bibstyle="unsrt")
+# BiocStyle::latex()
+@
+
+\title{\Biocpkg{moCluster}: Integrative clustering using multiple omics data}
+
+\author{Chen Meng}
+\date{Modified: June 03, 2015.  Compiled: \today.}
+
+\begin{document}
+
+<<include=FALSE>>=
+library(knitr)
+opts_chunk$set(
+concordance=TRUE
+)
+@
+
+
+<<include=FALSE>>=
+library(knitr)
+opts_chunk$set(
+concordance=TRUE, cache=TRUE, message=FALSE, out.width=".55\\textwidth", echo=TRUE, fig.width=6, fig.height=6, fig.align="center", result="markup", hold=TRUE
+)
+@
+
+% \SweaveOpts{concordance=TRUE}
+
+\maketitle
+
+\tableofcontents
+
+\section{moCluster overview}
+
+Introduction to moCluter algorithm.
+
+\section{Run moCluster}
+\subsection{Quick start}
+In this vignette, we will define subtypes the NCI-60 cell lines using four transcriptomic data from different microarray platforms. First we load the package and data
+
+<<loadLib>>=
+# loading package and gene expression data
+library(mogsa)
+data(NCI60_4arrays)
+@
+
+\Robject{NCI60\_4arrays} is a \Rclass{list} of \Rclass{data.frame}. The \Rclass{list} consists of microarray data for NCI-60 cell lines from different platforms. In each of the \Rclass{data.frame}, columns are the 60 cell lines and rows are genes. The data was downloaded from \cite{cellminer}, but only a small subset of genes were selected. Therefore, the result in this vignette is not intended for biological interpretation. Check the dimension of each matrix:
+
+<<dataDim>>=
+sapply(NCI60_4arrays, dim) # check dimensions of expression data
+@
+
+Before performing the moCluster analysis, we define some auxiliary variable to indicate the tissue of origin of cell lines and the color for each:
+<<auxiVar>>=
+tumorType <- sapply(strsplit(colnames(NCI60_4arrays$agilent), split="\\."), "[", 1)
+colcode <- as.factor(tumorType)
+levels(colcode) <- c("red", "green", "blue", "cyan", "orange", 
+                     "gray25", "brown", "gray75", "pink")
+colcode <- as.character(colcode)
+@
+
+Then we can apply the moCluster algorithm to clustering the 60 cell lines. The moCluster employs consensus PCA (CPCA) approach to integrate multiple omics data. CPCA approach is particularly suitable for the integrative clustering algorithm. The First, we call \Rfunction{mbpca} to perform the consensus PCA:
+<<mbpca1, fig.cap="The variance associated with each latent variable. Colors distinguishes the contributions from different data sets.">>=
+moa <- mbpca(NCI60_4arrays, ncomp = 10, k = "all", method = "globalScore", option = "lambda1", 
+             center=TRUE, scale=FALSE, moa = TRUE, svd.solver = "fast", maxiter = 1000)
+plot(moa, value="eig", type=2)
+@
+In the above commands, the argument \Rcode{ncomp = 10} specifies that 10 latent variables should be calculated. The argument \Rcode{k = "all"} suggest that no sparsity should be introduced to the loading factor. Sparsity in loading factor is a preferred property in multiple omics data analysis since only a subset of the variables would associated with the latent variables. Therefore, the interpret ability is increased. However, we do not introduce the sparsity for two reasons. First, we want to evaluate the relative contribution of variance as show in the figure. Second, we will use the permutation test to evaluate the latent variables that are representing the concordant structures in different data sets. This can be done with a permutation test, that is, permute the samples in each of the data and do the multi-block PCA:
+<<boot, fig.cap="permutation test">>=
+r <- bootMbpca(moa, mc.cores = 1, B=20, replace = FALSE, resample = "sample")
+@
+The result suggested that the top 3 latent variables account for concordance structures across data data. The elbow test also shows that the top 3 variables are significant. Therefore, we will use 3 latent variable in the subsequent analysis. Next, we are ready to calculate the latent variables with the parse loadings:
+<<mpbca2>>=
+moas <- mbpca(NCI60_4arrays, ncomp = 3, k = 0.1, method = "globalScore", option = "lambda1", 
+              center=TRUE, scale=FALSE, moa = TRUE, svd.solver = "fast", maxiter = 1000)
+@
+\Rcode{k = 0.1} indicates we only keep 10\% variables with non-zero coefficients in the result. The cluster will be perform using the latent variable, which could be extract by \Rfunction{moaScore}. We first extract the latent variables for both the sparse and non-sparse loading results. Then compare their correlation. 
+<<scoreCor>>=
+scr <- moaScore(moa)
+scrs <- moaScore(moas)
+diag(cor(scr[, 1:3], scrs))
+@
+They have a very high correlation so we assume the should account for the same variance or biological effects. Visualize the plot in the first three dimensions. 
+
+<<plot1, fig.width=10, fig.height=6>>=
+layout(matrix(1:2, 1, 2))
+plot(scrs[, 1:2], col=colcode, pch=20)
+legend("topright", legend = unique(tumorType), col=unique(colcode), pch=20)
+plot(scrs[, 2:3], col=colcode, pch=20)
+@
+
+Using gap statistic to evaluate the optimal number of clusters
+<<gap, fig.cap="gap statistic plot">>=
+gap <- moGap(moas, K.max = 12, cluster = "hcl")
+layout(matrix(1, 1, 1))
+gap$nClust
+@
+
+Using hierarchical cluster and plot
+<<cluster, fig.width=6, fig.height=3>>=
+hcl <- hclust(dist(scrs))
+cls <- cutree(hcl, k=4)
+clsColor <- as.factor(cls)
+levels(clsColor) <- c("red", "blue", "orange", "pink")
+clsColor <- as.character((clsColor))
+
+heatmap(t(scrs[hcl$order, ]), ColSideColors = colcode[hcl$order], Rowv = NA, Colv=NA)
+heatmap(t(scrs[hcl$order, ]), ColSideColors = clsColor[hcl$order], Rowv = NA, Colv=NA)
+@
+
+
+In order to interpret the result, extract the variable with non-zero coefficients
+<<coef>>=
+genes <- moaCoef(moas)
+genes$nonZeroCoef$agilent.V1.neg
+@
+
+
+
+
+\section{Session info}
+
+<<sessionInfo, results = 'asis', eval = TRUE, echo = TRUE>>=
+toLatex(sessionInfo())
+@
+
+\bibliography{mogsa}
+\end{document}

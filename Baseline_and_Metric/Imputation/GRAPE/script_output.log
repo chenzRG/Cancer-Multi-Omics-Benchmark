@@ -1,0 +1,28 @@
+GPU mem: 14, Select GPU 1
+Using GPU 1
+missing rate =  0.3
+step 1
+step 2
+step 3
+Traceback (most recent call last):
+  File "/opt/home/park/Nips2024-Yang/baseline_uci_mdi_all.py", line 68, in <module>
+    main()
+  File "/opt/home/park/Nips2024-Yang/baseline_uci_mdi_all.py", line 58, in main
+    data = load_data(args)
+  File "/opt/home/park/Nips2024-Yang/uci/uci_data.py", line 170, in load_data
+    data = get_data(df_X, df_y, args.node_mode, args.train_edge, args.split_sample, args.split_by, args.train_y, args.seed)
+  File "/opt/home/park/Nips2024-Yang/uci/uci_data.py", line 65, in get_data
+    edge_attr = torch.tensor(create_edge_attr(df_X), dtype=torch.float)
+  File "/opt/home/park/Nips2024-Yang/uci/uci_data.py", line 48, in create_edge_attr
+    edge_attr.append([float(df.iloc[i,j])])
+  File "/opt/home/park/miniconda3/envs/EHR/lib/python3.10/site-packages/pandas/core/indexing.py", line 1146, in __getitem__
+    return self.obj._get_value(*key, takeable=self._takeable)
+  File "/opt/home/park/miniconda3/envs/EHR/lib/python3.10/site-packages/pandas/core/frame.py", line 4002, in _get_value
+    series = self._ixs(col, axis=1)
+  File "/opt/home/park/miniconda3/envs/EHR/lib/python3.10/site-packages/pandas/core/frame.py", line 3803, in _ixs
+    col_mgr = self._mgr.iget(i)
+  File "/opt/home/park/miniconda3/envs/EHR/lib/python3.10/site-packages/pandas/core/internals/managers.py", line 996, in iget
+    values = block.iget(self.blklocs[i])
+  File "/opt/home/park/miniconda3/envs/EHR/lib/python3.10/site-packages/pandas/core/internals/blocks.py", line 1007, in iget
+    def iget(self, i: int | tuple[int, int] | tuple[slice, int]) -> np.ndarray:
+KeyboardInterrupt

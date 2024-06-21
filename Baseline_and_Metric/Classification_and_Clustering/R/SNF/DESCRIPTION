@@ -1,0 +1,9 @@
+Package: SNFtool
+Type: Package
+Title: Similarity  Network Fusion
+Version: 2.1
+Date: 2014-03-03
+Author: Bo Wang, Aziz Mezlini, Feyyaz Demir, Marc Fiume, Zhuowen Tu, Michael Brudno, Benjamin Haibe-Kains, Anna Goldenberg
+Maintainer: Bo Wang <wangbo.yunze@gmail.com>
+Description: Similarity Network Fusion takes multiple views of a network and fuses them together to construct an overall status matrix. The input to our algorithm can be feature vectors, pairwise distances, or pairwise similarities. The learned status matrix can then be used for retrieval, clustering, and classification.
+License: GPL

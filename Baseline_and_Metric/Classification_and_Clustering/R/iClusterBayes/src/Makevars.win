@@ -1,0 +1,2 @@
+PKG_FFLAGS=-fdefault-real-8 -ffixed-form
+PKG_LIBS=  ${LAPACK_LIBS} $(BLAS_LIBS) $(FLIBS)

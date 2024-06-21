@@ -1,0 +1,37 @@
+# 关于hydra的设置
+hydra:
+  job:
+    # 将工作路径设置到自动生成的路径中
+    chdir: true
+  run:
+    # 设置自动生成路径的位置
+    dir: /mnt/data1/share_data/rongzhiwei/outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+
+defaults:
+  - dataset: pan
+  - model: big
+  - train: ${dataset}
+  - _self_
+
+dataset:
+  # 组成batch的方式
+  iter_method: "loader"  # "random"
+  # 数据预处理：标准化的组学
+  normalize: ["meth", "rna", "CN", "miRNA"]
+  # 数据预处理：限制值的范围
+  clip: null
+  # 数据预处理：根据方差进行变量筛选
+  select: null
+  # 组学所服从的分布，会影响重构误差的形式
+  omic_dist_kind: "normal_varconst"
+  # omic_dist_kind:
+  #   meth: "binary_conti"
+  #   rna: "normal_varconst"
+  #   CN: "laplace_varconst"
+  #   miRNA: "normal_varconst"
+
+seed: 1
+cv: null
+test_size: 0.2  # 如果test_size是NULL且cv>1，则test_size默认是0.1
+
+save_model: false

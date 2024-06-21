@@ -1,0 +1,19 @@
+Script started at: 2024年  5月 22日 水曜日 18:31:58 JST
+GPU mem: 14, Select GPU 1
+Using GPU 1
+missing rate =  0.3
+step 1
+step 2
+step 3
+Traceback (most recent call last):
+  File "/opt/home/park/Nips2024-Yang/baseline_uci_mdi_all.py", line 68, in <module>
+    main()
+  File "/opt/home/park/Nips2024-Yang/baseline_uci_mdi_all.py", line 58, in main
+    data = load_data(args)
+  File "/opt/home/park/Nips2024-Yang/uci/uci_data.py", line 170, in load_data
+    data = get_data(df_X, df_y, args.node_mode, args.train_edge, args.split_sample, args.split_by, args.train_y, args.seed)
+  File "/opt/home/park/Nips2024-Yang/uci/uci_data.py", line 63, in get_data
+    edge_start, edge_end = create_edge(df_X)
+  File "/opt/home/park/Nips2024-Yang/uci/uci_data.py", line 38, in create_edge
+    edge_end = edge_end + list(n_row+np.arange(n_col)) # att    
+KeyboardInterrupt
