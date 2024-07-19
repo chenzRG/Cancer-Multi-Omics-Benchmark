@@ -85,6 +85,9 @@ pip install -r requirements.txt
 # Navigate to the scripts directory
 cd scripts
 
+# Download datasets
+./download.sh
+
 # Run the GRAPE script to reproduce all results related to the GRAPE model
 ./GRAPE.sh
 
