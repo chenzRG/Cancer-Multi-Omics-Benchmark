@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DROPBOX_LINK="https://www.dropbox.com/scl/fi/afai6qyt0einc2stn7eia/test.zip?rlkey=lshwq319gu9zqmmihdz3iyc9n&st=6cygtf5w&dl=1"
+DROPBOX_LINK="https://www.dropbox.com/scl/fi/g2djwgblekfepd62kgria/Main_Dataset.zip?rlkey=l5rl49qqnic6tpc9b3hyzjbmb&st=j4c7g5lz&dl=1"
 
 # Destination directory for the download
 DEST_DIR=".."
