@@ -1,7 +1,7 @@
 
 
 <div  align="center">    
-<img src="./docs/CMOB.png" width = "600" alt="pygdebias" align=center />
+<img src="./docs/MLOmics.png" width = "600" alt="pygdebias" align=center />
 </div>
 
 <!-- ![GitHub Repo stars](https://img.shields.io/github/stars/)
@@ -18,7 +18,7 @@
 ![GitHub](https://img.shields.io/github/license/) -->
 
 
-- [CMOB: Large-Scale Cancer Multi-Omics Benchmark with Open Datasets, Tasks, and Baselines](#cmob-large-scale-cancer-multi-omics-benchmark-with-open-datasets-tasks-and-baselines)
+- [MLOmics: Machine Learning Cancer Multi-Omics Benchmark with Datasets, Tasks, and Baselines](#mlomics-machine-learning-cancer-multi-omics-benchmark-with-datasets-tasks-and-baselines)
 
   - [Installations](#installations)
   - [Usage \& Examples](#usage--examples)
@@ -36,17 +36,18 @@
 
 -------------------
 
-# *CMOB*: Large-Scale Cancer Multi-Omics Benchmark with Open Datasets, Tasks, and Baselines
+# *MLOmics*: Machine Learning Cancer Multi-Omics Benchmark with Datasets, Tasks, and Baselines
 
 
-Machine learning has shown great potential in the field of cancer multi-omics studies, offering incredible opportunities for advancing precision medicine. However, the challenges associated with dataset curation and task formulation pose significant hurdles, especially for researchers lacking a biomedical background.
-Here, we introduce this library *CMOB*, the first large-scale cancer multi-omics benchmark integrates the TCGA platform, making data resources accessible and usable for machine learning researchers without significant preparation and expertise.
-
-To date, CMOB includes a collection of 20 cancer multi-omics datasets covering 32 cancers, accompanied by a systematic data processing pipeline. CMOB provides well-processed dataset versions to support 20 meaningful tasks in four studies, with a collection of benchmarks. 
-We also integrate CMOB with two complementary resources and various biological tools to explore broader research avenues. 
-All resources are open-accessible with user-friendly and compatible integration scripts that enable non-experts to easily incorporate this complementary information for various tasks. 
+Machine learning has shown great potential in the field of cancer multi-omics studies, offering incredible opportunities for advancing precision medicine. 
+However, the challenges associated with dataset curation and task formulation pose significant hurdles, especially for researchers lacking a biomedical background.
+Here, we introduce the MLOmics, the first large-scale cancer multi-omics benchmark that integrates the TCGA platform, making data resources accessible and usable for machine learning researchers without significant preparation and expertise.
+To date, MLOmics includes a collection of 20 cancer multi-omics datasets covering 32 cancers, accompanied by a systematic data processing pipeline. 
+MLOmics provides well-processed dataset versions to support 20 meaningful tasks in four studies, with a collection of benchmarks.
+We also integrate MLOmics with two complementary resources and various biological tools to explore broader research avenues.
+All resources are open-accessible with user-friendly and compatible integration scripts that enable non-experts to easily incorporate this complementary information for various tasks.
 We conduct extensive experiments on selected datasets to offer recommendations on suitable machine learning baselines for specific applications. 
-Through CMOB, we aim to facilitate algorithmic advances and hasten the development, validation, and clinical translation of machinelearning models for personalized cancer treatments.
+Through MLOmics, we aim to facilitate algorithmic advances and hasten the development, validation, and clinical translation of machine-learning models for personalized cancer treatments. 
 
 <!-- ## 1. Citation
 
@@ -71,7 +72,7 @@ or:
 Here, we provide guidelines for setting up the library. 
 ```bash
 # Set up the environment
-conda create -n cmob python=3.9
+conda create -n mlomics python=3.9
 conda activate 
 
 # Installation
