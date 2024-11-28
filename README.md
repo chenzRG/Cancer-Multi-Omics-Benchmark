@@ -51,8 +51,8 @@ Through MLOmics, we aim to facilitate algorithmic advances and hasten the develo
 
 <!-- ## 1. Citation
 
-Our spaper "CMOB: Large-Scale Cancer Multi-Omics Benchmark with Open Datasets, Tasks, and Baselines" has been accepted    and released on arxiv [\[PDF\]](http: .pdf). 
-If you find *CMOB* helpful, we would appreciate citations to the following paper:
+Our spaper "MLOmics: Large-Scale Cancer Multi-Omics Benchmark with Open Datasets, Tasks, and Baselines" has been accepted    and released on arxiv [\[PDF\]](http: .pdf). 
+If you find *MLOmics* helpful, we would appreciate citations to the following paper:
 
 ```
 @article{
@@ -62,7 +62,7 @@ If you find *CMOB* helpful, we would appreciate citations to the following paper
 or:
 
 ```
-. (2024). CMOB: Large-Scale Cancer Multi-Omics Benchmark with Open Datasets, Tasks, and Baselines
+. (2024). MLOmics: Large-Scale Cancer Multi-Omics Benchmark with Open Datasets, Tasks, and Baselines
 ``` -->
 
 
@@ -102,7 +102,7 @@ cd scripts
 
 ### Summary
 
-CMOB provides a collection of 20 multi-omics datasets including:
+MLOmics provides a collection of 20 multi-omics datasets including:
 
 - **One pan-cancer dataset** involving patients with 32 cancer types.
 - **Nine unlabeled cancer subtype datasets** including Adrenocortical Carcinoma (ACC), Kidney Renal Papillary Cell Carcinoma (KIRP), Kidney Renal Clear Cell Carcinoma (KIRC), Liver Hepatocellular Carcinoma (LIHC), Lung Adenocarcinoma (LUAD), Lung Squamous Cell Carcinoma (LUSC), Prostate Adenocarcinoma (PRAD), Thyroid Carcinoma (THCA), and Thymoma (THYM).
@@ -112,7 +112,7 @@ CMOB provides a collection of 20 multi-omics datasets including:
 
 ### Multiple-Scaled Feature
 
-Cancer multi-omics analysis always suffers from an unbalanced sample and feature size. CMOB hence provides three versions of feature scales, i.e., **Original**, **Top**, and **Aligned**, to support feasible analysis.
+Cancer multi-omics analysis always suffers from an unbalanced sample and feature size. MLOmics hence provides three versions of feature scales, i.e., **Original**, **Top**, and **Aligned**, to support feasible analysis.
 - **Original features** are extracted directly from each dataset and correspond to the complete set of features without filtering. Users can customize their datasets.
 - **Top features** are identified through ANOVA statistical testing according to p-values, selecting the most significant features among samples. This approach unifies the feature size and potentially reduces the noise features.
 - **Aligned features** are determined by the intersection of features present across all sub-datasets, corresponding to the shared features among different sub-datasets.
@@ -120,7 +120,7 @@ Cancer multi-omics analysis always suffers from an unbalanced sample and feature
 
 ### Datasets
 
-CMOB provides a collection of 20 multi-omics datasets covering 32 cancer types, that is, one Pan-cancer dataset, nine unlabeled cancer subtype datasets, five labeled, golden-standard subtype datasets, and five TCGA data imputation datasets.
+MLOmics provides a collection of 20 multi-omics datasets covering 32 cancer types, that is, one Pan-cancer dataset, nine unlabeled cancer subtype datasets, five labeled, golden-standard subtype datasets, and five TCGA data imputation datasets.
 
 | Dataset     | Feature Scale | mRNA  | miRNA | Methy | CNV   | Sample Size | #Baselines | Learning Task    |
 |-------------|----------------|-------|-------|-------|-------|-------------|------------|------------------|
@@ -149,7 +149,7 @@ CMOB provides a collection of 20 multi-omics datasets covering 32 cancer types, 
 
 
 ## Task \& Baselines
-CMOB currently provides 20 learning tasks in three studies, including pan-cancer classification, cancer subtype identification, and omics data imputation, each with a corresponding dataset version, baseline methods, and evaluation metrics.
+MLOmics currently provides 20 learning tasks in three studies, including pan-cancer classification, cancer subtype identification, and omics data imputation, each with a corresponding dataset version, baseline methods, and evaluation metrics.
 
 ### Pan-cancer Classification
 
@@ -269,7 +269,7 @@ We conducted missing value imputation experiments on five types of transcriptomi
 
 <!-- 
 ## Folder Structure
-CMOB
+MLOmics
 ├── Main Datasets
 │ ├── Pan-Cancer Dataset [Labeled]
 │ │ └── Pan-Cancer
@@ -314,7 +314,7 @@ CMOB
 │
 ├── Complementary Resources
   ├── Mapping File
-  │ └── CMOB_STRING_mapping.csv
+  │ └── MLOmics_STRING_mapping.csv
   ├── Clinical Annotation
   │ └── Clinical_Rec.csv
   └── Biological Attribute Analysis Tools
