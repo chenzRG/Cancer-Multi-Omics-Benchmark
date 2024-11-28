@@ -1,7 +1,7 @@
 
 
 <div  align="center">    
-<img src="./docs/MLOmics.png" width = "600" alt="pygdebias" align=center />
+<img src="./docs/MLOmics.png" width = "800" alt="pygdebias" align=center />
 </div>
 
 <!-- ![GitHub Repo stars](https://img.shields.io/github/stars/)
