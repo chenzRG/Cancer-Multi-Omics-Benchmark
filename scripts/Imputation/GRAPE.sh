@@ -4,7 +4,7 @@
 current_dir=$(pwd)
 
 # Navigate to the specific folder
-cd ../Baseline_and_Metric/Imputation/GRAPE
+cd ../../Baseline_and_Metric/Imputation/GRAPE
 
 # Ensure the logs directory exists
 if [ ! -d "./logs" ]; then

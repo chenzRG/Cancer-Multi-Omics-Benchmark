@@ -10,3 +10,5 @@ fancyimpute
 seaborn
 torch
 torch_geometric
+gseapy
+statsmodels

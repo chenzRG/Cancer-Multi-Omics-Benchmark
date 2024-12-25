@@ -4,7 +4,7 @@
 current_dir=$(pwd)
 
 # Navigate to the specific folder
-cd ../Baseline_and_Metric/Imputation/GAIN
+cd ../../Baseline_and_Metric/Imputation/GAIN
 
 # Define the output file
 output_file="$current_dir/GAIN.txt"
