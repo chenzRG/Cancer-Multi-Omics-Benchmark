@@ -137,30 +137,30 @@ Where:
 - <version>: feature version name (e.g., Original, Aligned, Top)
 - [options]: Optional parameters like missing rate (e.g., 0.3)
 
-### Running Baselines
+### 1. Running Baselines
 
-Classification Tasks:
+A. Classification Tasks:
 ```bash
 # Run classification with DeepCC model on GS-BRCA Original data
 $ cd Scripts/Classification
 $ ./DeepCC.sh GS-BRCA original
 ```
 
-Clustering Tasks:
+B. Clustering Tasks:
 ```bash
 # Run clustering with Subtype-GAN model on ACC Top data
 $ cd Scripts/Clustering
 $ ./Subtype-GAN.sh ACC Top
 ```
 
-Imputation Tasks:
+C. Imputation Tasks:
 ```bash
 # Run imputation with GAIN model on 30% missing ACC Top data
 $ cd Scripts/Imputation
 $ ./GAIN.sh GS-BRCA Top 0.3 
 ```
 
-### Downstream Analysis
+### 2. Downstream Analysis
 MLOmics provides comprehensive tools for biological interpretation of machine learning results, primarily focused on differential expression analysis and pathway enrichment.
 
 KEGG pathway analysis:
