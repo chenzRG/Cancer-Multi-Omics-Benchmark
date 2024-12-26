@@ -139,21 +139,21 @@ Where:
 
 ### 1. Running Baselines
 
-A. Classification Tasks:
+Classification Tasks:
 ```bash
 # Run classification with DeepCC model on GS-BRCA Original data
 $ cd Scripts/Classification
 $ ./DeepCC.sh GS-BRCA original
 ```
 
-B. Clustering Tasks:
+Clustering Tasks:
 ```bash
 # Run clustering with Subtype-GAN model on ACC Top data
 $ cd Scripts/Clustering
 $ ./Subtype-GAN.sh ACC Top
 ```
 
-C. Imputation Tasks:
+Imputation Tasks:
 ```bash
 # Run imputation with GAIN model on 30% missing ACC Top data
 $ cd Scripts/Imputation
