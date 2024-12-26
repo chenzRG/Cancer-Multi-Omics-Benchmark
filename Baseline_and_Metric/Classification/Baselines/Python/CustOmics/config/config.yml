@@ -1,0 +1,28 @@
+general:
+    cohorts: TCGA-BRCA
+    device: cuda:0
+    data_directory: ../TCGA/
+    results_directory: results/
+    task: classification
+    sources: ['CNV', 'RNAseq', 'methyl']
+training_hyperparameters:
+    num_classes: 4 
+    batch_size: 32
+    epochs: 10
+    p2_switch: 5
+    lr: 1e-3
+    beta: 1
+    dropout: 0.2
+network_hyperparameters:
+    hidden_dim: [512, 256]
+    central_dim: [512, 256]
+    latent_dim: 128
+downstream_hyperparameters:
+    classifier_dim: [256, 128]
+    survival_dim: [64, 32]
+    lambda_classif: 5
+    lambda_survival: 5
+interpretation_parameters:
+    explain: True
+    explained_class: Her2
+    explained_source: RNAseq

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-task=$1
 
 # Save the current directory
 current_dir=$(pwd)
@@ -9,14 +8,14 @@ current_dir=$(pwd)
 cd ../../../Classification_and_Clustering/Python/Subtype-GAN
 
 # Record the start time
-echo "Script started at: $(date)" >> results/$2_$3.cc
+echo "Script started at: $(date)" >> results/$1_$2.cc
 
 
-python SubtypeGAN.py -m SubtypeGAN -n 4 -t $2_$3 # set dummy number of clusters to 4 
-python SubtypeGAN.py -m cc -t $2_$3
+python SubtypeGAN.py -m SubtypeGAN -n 4 -t $1_$2 # set dummy number of clusters to 4 
+python SubtypeGAN.py -m cc -t $1_$2
 
 # Record the end time
-echo "Script ended at: $(date)" >> results/$2_$3.cc
+echo "Script ended at: $(date)" >> results/$1_$2.cc
 
 # Navigate back to the original directory
 cd "$current_dir"

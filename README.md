@@ -69,34 +69,113 @@ or:
 
 ## Installations
 
-Here, we provide guidelines for setting up the library. 
+### Step 1. Clone the repository:
+```bash
+$ git clone https://github.com/chenzRG/Cancer-Multi-Omics-Benchmark
+$ cd Cancer-Multi-Omics-Benchmark
+```
+
+### Step 2. Set up the environment:
 ```bash
 # Set up the environment
 conda create -n mlomics python=3.9
 conda activate 
+```
 
-# Installation
+### Step 3. Install requirements:
+```bash
 pip install -r requirements.txt
 ```
 
-
-## Usage & Examples
-
+### Step 4. Download datasets:
 ```bash
-# Navigate to the scripts directory
-cd scripts
-
-# Download datasets
-./download.sh
-
-# Run the GRAPE script to reproduce all results related to the GRAPE model
-./GRAPE.sh
-
-# Run the GAIN script to reproduce all results related to the GAIN model
-./GAIN.sh
+$ ./download.sh
 ```
 
 
+## Repository Structure
+```
+MLOmics/
+├── Main_Dataset                     # Main Datasets
+├── Baseline_and_Metric/             # Baseline & Metrics
+│   └── Tasks/
+│       ├── Baselines/   
+│       │   ├── R/                   # Traditional ML models (.r files)
+│       │   └── Python/              # Deep learning models (.py files)
+│       └── Metrics/
+│           └── task_metrics.py      # Evaluation metrics for each task
+├── Dwonstream_Analysis_Tools_and_resources/                     
+│   ├── Knowledge_bases/             # Biological knowledge bases
+│   │   ├── STRING_mapping.csv       # STRING database mapping
+│   │   └── KEGG_mapping.csv         # KEGG pathway mapping
+│   ├── Clinical_annotation/         # Patient clinical data
+│   │   └── clinical_record.csv      
+│   └── Analysis_tools/              # Analysis scripts
+│       └── Analysis_Tools_and_Resources.py
+└── Scripts/                         # Quick start scripts
+    ├── Tasks/       
+    └── Dwonstream_Analysis               
+```
+
+## Dataset Usage
+
+Each dataset is available in three feature versions:
+- Original: Full feature set
+- Aligned: Intersection of features across cancer types
+- Top: Most significant features selected via ANOVA
+
+## Quick Start
+
+MLOmics provides a standardized interface to run all baseline models:
+```bash
+$ ./<baseline_model>.sh <dataset> <version> [options]
+```
+
+Where:
+- <baseline_model>: Name of the model script (e.g., GRAPE.sh, Subtype-GAN.sh)
+- <dataset>: Target dataset name (e.g., GS-BRCA, ACC)
+- <version>: feature version name (e.g., Original, Aligned, Top)
+- [options]: Optional parameters like missing rate (e.g., 0.3)
+
+### Running Baselines
+
+Classification Tasks:
+```bash
+# Run classification with DeepCC model on GS-BRCA Original data
+$ cd Scripts/Classification
+$ ./DeepCC.sh GS-BRCA original
+```
+
+Clustering Tasks:
+```bash
+# Run clustering with Subtype-GAN model on ACC Top data
+$ cd Scripts/Clustering
+$ ./Subtype-GAN.sh ACC Top
+```
+
+Imputation Tasks:
+```bash
+# Run imputation with GAIN model on 30% missing ACC Top data
+$ cd Scripts/Imputation
+$ ./GAIN.sh GS-BRCA Top 0.3 
+```
+
+### Downstream Analysis
+MLOmics provides comprehensive tools for biological interpretation of machine learning results, primarily focused on differential expression analysis and pathway enrichment.
+
+KEGG pathway analysis:
+```bash
+$ cd Scripts/Dwonstream_Analysis
+$ ./pwanalysis.sh <clustering_log_path> [options]
+  --p_value_cutoff 0.05       # Significance threshold for genes
+```
+
+Generate volcano plot:
+```bash
+$ cd Scripts/Dwonstream_Analysis
+$ ./volcano.sh <clustering_log_path> [options]
+  --p_value_threshold 0.05     # P-value significance threshold
+```
 
 ## Datasets
 
