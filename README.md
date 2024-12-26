@@ -21,7 +21,7 @@
 - [MLOmics: Machine Learning Cancer Multi-Omics Benchmark with Datasets, Tasks, and Baselines](#mlomics-machine-learning-cancer-multi-omics-benchmark-with-datasets-tasks-and-baselines)
 
   - [Installations](#installations)
-  - [Usage \& Examples](#usage--examples)
+  - [Quick Start](#quick-start)
   - [Datasets](#datasets)
   - [Tasks \& Baselines](#tasks--baselines)
   - [Performance Leaderboards](#performance-leaderboards)
