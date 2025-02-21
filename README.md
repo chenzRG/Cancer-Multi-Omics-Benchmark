@@ -41,7 +41,6 @@
 
 Framing the investigation of diverse cancers as a machine learning problem has recently shown significant potential in multi-omics analysis and cancer research.
 Empowering these successful machine learning models are the high-quality training datasets with sufficient data volume and adequate preprocessing.
-However, while there exist several public data portals including The Cancer Genome Atlas (TCGA) multi-omics initiative or open-bases such as the LinkedOmics, these databases are not off-the-shelf for existing machine learning models.
 MLOmics is an open cancer multi-omics benchmark aiming at serving better the development and evaluation of bioinformatics and machine learning models.
 MLOmics contains 8,314 patient samples covering all 32 cancer types with four omics types, stratified features, and extensive baselines.
 Complementary support for downstream analysis and bio-knowledge linking are also included to support interdisciplinary analysis. 
