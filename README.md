@@ -36,7 +36,7 @@
 
 -------------------
 
-# *MLOmics*: Machine Learning Cancer Multi-Omics Benchmark with Datasets, Tasks, and Baselines
+# *MLOmics*: Benchmark for Machine Learning on Cancer Multi-Omics Data
 
 
 Machine learning has shown great potential in the field of cancer multi-omics studies, offering incredible opportunities for advancing precision medicine. 
