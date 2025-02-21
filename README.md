@@ -18,7 +18,7 @@
 ![GitHub](https://img.shields.io/github/license/) -->
 
 
-- [MLOmics: Machine Learning Cancer Multi-Omics Benchmark with Datasets, Tasks, and Baselines](#mlomics-machine-learning-cancer-multi-omics-benchmark-with-datasets-tasks-and-baselines)
+- [MLOmics: Benchmark for Machine Learning on Cancer Multi-Omics Data](#mlomics-machine-learning-cancer-multi-omics-benchmark-with-datasets-tasks-and-baselines)
 
   - [Installations](#installations)
   - [Quick Start](#quick-start)
