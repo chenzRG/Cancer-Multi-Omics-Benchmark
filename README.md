@@ -39,15 +39,12 @@
 # *MLOmics*: Benchmark for Machine Learning on Cancer Multi-Omics Data
 
 
-Machine learning has shown great potential in the field of cancer multi-omics studies, offering incredible opportunities for advancing precision medicine. 
-However, the challenges associated with dataset curation and task formulation pose significant hurdles, especially for researchers lacking a biomedical background.
-Here, we introduce the MLOmics, the first large-scale cancer multi-omics benchmark that integrates the TCGA platform, making data resources accessible and usable for machine learning researchers without significant preparation and expertise.
-To date, MLOmics includes a collection of 20 cancer multi-omics datasets covering 32 cancers, accompanied by a systematic data processing pipeline. 
-MLOmics provides well-processed dataset versions to support 20 meaningful tasks in four studies, with a collection of benchmarks.
-We also integrate MLOmics with two complementary resources and various biological tools to explore broader research avenues.
-All resources are open-accessible with user-friendly and compatible integration scripts that enable non-experts to easily incorporate this complementary information for various tasks.
-We conduct extensive experiments on selected datasets to offer recommendations on suitable machine learning baselines for specific applications. 
-Through MLOmics, we aim to facilitate algorithmic advances and hasten the development, validation, and clinical translation of machine-learning models for personalized cancer treatments. 
+Framing the investigation of diverse cancers as a machine learning problem has recently shown significant potential in multi-omics analysis and cancer research.
+Empowering these successful machine learning models are the high-quality training datasets with sufficient data volume and adequate preprocessing.
+However, while there exist several public data portals including The Cancer Genome Atlas (TCGA) multi-omics initiative or open-bases such as the LinkedOmics, these databases are not off-the-shelf for existing machine learning models.
+MLOmics is an open cancer multi-omics benchmark aiming at serving better the development and evaluation of bioinformatics and machine learning models.
+MLOmics contains 8,314 patient samples covering all 32 cancer types with four omics types, stratified features, and extensive baselines.
+Complementary support for downstream analysis and bio-knowledge linking are also included to support interdisciplinary analysis. 
 
 <!-- ## 1. Citation
 
