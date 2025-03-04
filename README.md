@@ -135,13 +135,6 @@ Where:
 
 ### 1. Running Baselines
 
-Classification Tasks:
-```bash
-# Run classification with DeepCC model on GS-BRCA Original data
-$ cd Scripts/Classification
-$ ./DeepCC.sh GS-BRCA original
-```
-
 Clustering Tasks:
 ```bash
 # Run clustering with Subtype-GAN model on ACC Top data
@@ -151,9 +144,17 @@ $ ./Subtype-GAN.sh ACC Top
 
 Imputation Tasks:
 ```bash
-# Run imputation with GAIN model on 30% missing ACC Top data
+# Run imputation with GAIN model on 30% missing BRCA CNV data
 $ cd Scripts/Imputation
-$ ./GAIN.sh GS-BRCA Top 0.3 
+$ ./GAIN.sh BRCA CNV 0.3 
+```
+
+
+Classification Tasks:
+```bash
+# Run classification with DeepCC model on GS-BRCA Original data
+$ cd Scripts/Classification
+$ ./DeepCC.sh GS-BRCA original
 ```
 
 ### 2. Downstream Analysis

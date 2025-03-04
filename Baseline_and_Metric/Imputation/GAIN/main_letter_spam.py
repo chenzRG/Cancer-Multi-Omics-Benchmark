@@ -53,6 +53,9 @@ def main (args):
                      'iterations': args.iterations}
   
   # Load data and introduce missingness
+  print("\n")
+  print(data_name)
+  print("\n")
   ori_data_x, miss_data_x, data_m = data_loader(data_name, miss_rate)
   
   # Impute missing data
@@ -74,8 +77,7 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser()
   parser.add_argument(
       '--data_name',
-      choices=['letter','spam', 'BCRA', 'COAD', 'OV', 'LGG', 'GBM'],
-      default='spam',
+      default='BCRA_CNV',
       type=str)
   parser.add_argument(
       '--miss_rate',

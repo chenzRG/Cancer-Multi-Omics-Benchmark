@@ -35,12 +35,8 @@ def data_loader (data_name, miss_rate):
   '''
   
   # Load data
-  if data_name in ['letter', 'spam', 'BCRA', 'COAD', 'OV', 'LGG', 'GBM']:
-    file_name = '../../../Main_Dataset/Imputation_datasets/'+data_name+'.csv'
-    data_x = np.loadtxt(file_name, delimiter=",", skiprows=1)
-  elif data_name == 'mnist':
-    (data_x, _), _ = mnist.load_data()
-    data_x = np.reshape(np.asarray(data_x), [60000, 28*28]).astype(float)
+  file_name = '../../../Main_Dataset/Imputation_datasets/Imp-'+data_name.split("_")[0]+'/Top/'+data_name+'.csv'
+  data_x = np.genfromtxt(file_name, delimiter=',', dtype=str)[1:,1:].astype(float)
 
   # Parameters
   no, dim = data_x.shape

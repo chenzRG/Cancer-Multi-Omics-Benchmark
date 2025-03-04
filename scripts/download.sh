@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DROPBOX_LINK="https://www.dropbox.com/scl/fi/g2djwgblekfepd62kgria/Main_Dataset.zip?rlkey=l5rl49qqnic6tpc9b3hyzjbmb&st=j4c7g5lz&dl=1"
+DROPBOX_LINK="https://www.dropbox.com/scl/fi/rve3e6sk1u33eio3hf6xw/Main_Dataset.zip?rlkey=qk5slerdkk00qa8xm1pfq2a71&st=ylunh6ai&dl=1"
 
 # Destination directory for the download
 DEST_DIR=".."
@@ -22,4 +22,4 @@ unzip "${DEST_DIR}/${FILE_NAME}" -d "$DEST_DIR"
 # Remove the ZIP file after extraction
 rm "${DEST_DIR}/${FILE_NAME}"
 
-echo "Folder has been downloaded and extracted to ${DEST_DIR}/${DEST_DIR}."
+echo "Main_Dataset Folder has been downloaded and extracted to ${DEST_DIR}."
