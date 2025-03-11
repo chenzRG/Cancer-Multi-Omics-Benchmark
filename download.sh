@@ -6,7 +6,7 @@ FILE_ID="1JF4aHuRS7_EXgjN8VySej0wNfoXn9nnQ"
 # Destination directory for the download
 DEST_DIR=".."
 
-# 文件名
+# file name
 FILE_NAME="Main_Dataset.zip"
 
 # check gdown installation
