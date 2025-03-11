@@ -12,3 +12,4 @@ torch
 torch_geometric
 gseapy
 statsmodels
+gdown
