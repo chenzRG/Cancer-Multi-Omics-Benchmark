@@ -432,3 +432,16 @@ Reach out to us by submitting an issue report or sending an email to . -->
 [9] [Eloise Withnell, Xiaoyu Zhang, Kai Sun, and Yike Guo. Xomivae: an interpretable deep learning model for cancer classification using high-dimensional omics data. Briefings in bioinformatics, 22(6):bbab315, 2021.](https://academic.oup.com/bib/article/22/6/bbab315/6353242)
 
 [10] [Zhiwei Rong, Zhilin Liu, Jiali Song, Lei Cao, Yipe Yu, Mantang Qiu, and Yan Hou. Mclustervaes: an end-to-end variational deep learning-based clustering method for subtype discovery using multi-omics data. Computers in Biology and Medicine, 150:106085, 2022.](https://www.sciencedirect.com/science/article/pii/S0010482522007934?via%3Dihub)
+
+## Citation
+If you find our work useful in your research, please consider citing:
+```
+@misc{MLOmics,
+      title={MLOmics: Benchmark for Machine Learning on Cancer Multi-Omics Data}, 
+      author={Ziwei Yang and Rikuto Kotoge and Xihao Piao and Zheng Chen and Lingwei Zhu and Peng Gao and Yasuko Matsubara and Yasushi Sakurai and Jimeng Sun},
+      year={2025},
+      eprint={2409.02143},
+      archivePrefix={arXiv},
+      url={https://arxiv.org/abs/2409.02143}
+}
+```
