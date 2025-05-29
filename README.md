@@ -85,7 +85,10 @@ pip install -r requirements.txt
 
 ### Step 4. Download datasets:
 ```bash
+# Please make sure git-lfs is installed when downloading from HuggingFace.
 $ ./download.sh
+
+# Alternatively, you can download the dataset from figshare: https://figshare.com/articles/dataset/MLOmics_Cancer_Multi-Omics_Database_for_Machine_Learning/28729127
 ```
 
 
