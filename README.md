@@ -439,12 +439,14 @@ Reach out to us by submitting an issue report or sending an email to . -->
 ## Citation
 If you find our work useful in your research, please consider citing:
 ```
-@misc{MLOmics,
-      title={MLOmics: Benchmark for Machine Learning on Cancer Multi-Omics Data}, 
-      author={Ziwei Yang and Rikuto Kotoge and Xihao Piao and Zheng Chen and Lingwei Zhu and Peng Gao and Yasuko Matsubara and Yasushi Sakurai and Jimeng Sun},
-      year={2025},
-      eprint={2409.02143},
-      archivePrefix={arXiv},
-      url={https://arxiv.org/abs/2409.02143}
+@article{2025mlomics,
+  title={MLOmics: Cancer Multi-Omics Database for Machine Learning},
+  author={Yang, Ziwei and Kotoge, Rikuto and Piao, Xihao and Chen, Zheng and Zhu, Lingwei and Gao, Peng and Matsubara, Yasuko and Sakurai, Yasushi and Sun, Jimeng},
+  journal={Scientific Data},
+  volume={12},
+  number={1},
+  pages={1--9},
+  year={2025},
+  publisher={Nature Publishing Group}
 }
 ```
