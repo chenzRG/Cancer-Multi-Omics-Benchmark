@@ -199,34 +199,6 @@ Cancer multi-omics analysis always suffers from an unbalanced sample and feature
 
 ### Datasets
 
-MLOmics provides a collection of 20 multi-omics datasets covering 32 cancer types, that is, one Pan-cancer dataset, nine unlabeled cancer subtype datasets, five labeled, golden-standard subtype datasets, and five TCGA data imputation datasets.
-
-| Dataset     | Feature Scale | mRNA  | miRNA | Methy | CNV   | Sample Size | #Baselines | Learning Task    |
-|-------------|----------------|-------|-------|-------|-------|-------------|------------|------------------|
-| ACC         | Original       | 18034 | 368   | 19045 | 19525 | 177         | 10         | Clustering       |
-| KIRP        | Original       | 18465 | 769   | 18715 | 19551 | 273         | 10         | Clustering       |
-| KIRC        | Original       | 18464 | 352   | 19045 | 19523 | 314         | 10         | Clustering       |
-| LIHC        | Original       | 17946 | 846   | 18714 | 19551 | 364         | 10         | Clustering       |
-| LUAD        | Original       | 18310 | 427   | 19052 | 19551 | 450         | 10         | Clustering       |
-| LUSC        | Original       | 18206 | 423   | 19060 | 19551 | 363         | 10         | Clustering       |
-| PRAD        | Original       | 17954 | 759   | 19049 | 19568 | 450         | 10         | Clustering       |
-| THCA        | Original       | 17261 | 375   | 19052 | 19551 | 291         | 10         | Clustering       |
-| THYM        | Original       | 18354 | 1018  | 18716 | 19551 | 119         | 10         | Clustering       |
-| Pan-cancer  | Aligned        | 3217  | 383   | 3139  | 3105  | 8314        | 10         | Classification   |
-| GS-COAD     | Original       | 17261 | 375   | 19052 | 19551 | 260         | 10         | Classification   |
-| GS-BRCA     | Original       | 18206 | 368   | 19049 | 19568 | 671         | 10         | Classification   |
-| GS-GBM      | Original       | 20684 | 335   | 19034 | 19545 | 243         | 10         | Classification   |
-| GS-LGG      | Original       | 18345 | 345   | 19023 | 19534 | 246         | 10         | Classification   |
-| GS-OV       | Original       | 17354 | 244   | 19034 | 19534 | 284         | 10         | Classification   |
-| Imp-COAD    | Top            | 2000  | 200   | 2000  | 2000  | 260         | 7          | Imputation       |
-| Imp-BRCA    | Top            | 2000  | 200   | 2000  | 2000  | 671         | 7          | Imputation       |
-| Imp-GBM     | Top            | 2000  | 200   | 2000  | 2000  | 243         | 7          | Imputation       |
-| Imp-LGG     | Top            | 2000  | 200   | 2000  | 2000  | 246         | 7          | Imputation       |
-| Imp-OV      | Top            | 2000  | 200   | 2000  | 2000  | 284         | 7          | Imputation       |
-
-
-Table: MLOmics provides multiple feature scales for nine unlabeled cancer subtype datasets and five labeled, golden-standard subtype datasets.
-
 | Dataset      | Feature Scale | mRNA  | miRNA | Methy | CNV   |
 |--------------|---------------|-------|-------|-------|-------|
 | ACC          | Original      | 18204 | 368   | 19045 | 19525 |
