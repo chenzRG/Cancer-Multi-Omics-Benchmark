@@ -116,12 +116,42 @@ MLOmics/
     └── Dwonstream_Analysis               
 ```
 
-## Dataset Usage
+## Cancer Types and Abbreviations
 
-Each dataset is available in three feature versions:
-- Original: Full feature set
-- Aligned: Intersection of features across cancer types
-- Top: Most significant features selected via ANOVA
+| No. | Full Name                                      | Abbreviation |
+|-----|------------------------------------------------|--------------|
+| 1   | Acute Myeloid Leukemia                         | LAML         |
+| 2   | Adrenocortical Cancer                          | ACC          |
+| 3   | Bladder Urothelial Carcinoma                   | BLCA         |
+| 4   | Brain Lower Grade Glioma                       | LGG          |
+| 5   | Breast Invasive Carcinoma                      | BRCA         |
+| 6   | Cervical & Endocervical Cancer                 | CESC         |
+| 7   | Cholangiocarcinoma                             | CHOL         |
+| 8   | Colon Adenocarcinoma                           | COAD         |
+| 9   | Diffuse Large B-cell Lymphoma                  | DLBC         |
+| 10  | Esophageal Carcinoma                           | ESCA         |
+| 11  | Head & Neck Squamous Cell Carcinoma            | HNSC         |
+| 12  | Kidney Chromophobe                             | KICH         |
+| 13  | Kidney Clear Cell Carcinoma                    | KIRC         |
+| 14  | Kidney Papillary Cell Carcinoma                | KIRP         |
+| 15  | Liver Hepatocellular Carcinoma                 | LIHC         |
+| 16  | Lung Adenocarcinoma                            | LUAD         |
+| 17  | Lung Squamous Cell Carcinoma                   | LUSC         |
+| 18  | Mesothelioma                                   | MESO         |
+| 19  | Ovarian Serous Cystadenocarcinoma              | OV           |
+| 20  | Pancreatic Adenocarcinoma                      | PAAD         |
+| 21  | Pheochromocytoma & Paraganglioma               | PCPG         |
+| 22  | Prostate Adenocarcinoma                        | PRAD         |
+| 23  | Rectum Adenocarcinoma                          | READ         |
+| 24  | Sarcoma                                        | SARC         |
+| 25  | Skin Cutaneous Melanoma                        | SKCM         |
+| 26  | Stomach Adenocarcinoma                         | STAD         |
+| 27  | Testicular Germ Cell Tumor                     | TGCT         |
+| 28  | Thymoma                                        | THYM         |
+| 29  | Thyroid Carcinoma                              | THCA         |
+| 30  | Uterine Carcinosarcoma                         | UCS          |
+| 31  | Uterine Corpus Endometrioid Carcinoma          | UCEC         |
+| 32  | Uveal Melanoma                                 | UVM          |
 
 ## Quick Start
 
