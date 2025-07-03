@@ -225,6 +225,53 @@ MLOmics provides a collection of 20 multi-omics datasets covering 32 cancer type
 | Imp-OV      | Top            | 2000  | 200   | 2000  | 2000  | 284         | 7          | Imputation       |
 
 
+Table: MLOmics provides multiple feature scales for nine unlabeled cancer subtype datasets and five labeled, golden-standard subtype datasets.
+
+| Dataset      | Feature Scale | mRNA  | miRNA | Methy | CNV   |
+|--------------|---------------|-------|-------|-------|-------|
+| ACC          | Original      | 18204 | 368   | 19045 | 19525 |
+|              | Aligned       | 10452 | 254   | 10347 | 10154 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| KIRP         | Original      | 17254 | 375   | 19023 | 19532 |
+|              | Aligned       | 10452 | 254   | 10347 | 10154 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| KIRC         | Original      | 18464 | 352   | 19045 | 19523 |
+|              | Aligned       | 10452 | 254   | 10347 | 10154 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| LIHC         | Original      | 17945 | 435   | 19053 | 19523 |
+|              | Aligned       | 10452 | 254   | 10347 | 10154 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| LUAD         | Original      | 18303 | 435   | 19034 | 19532 |
+|              | Aligned       | 10452 | 254   | 10347 | 10154 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| LUSC         | Original      | 18577 | 745   | 19025 | 19543 |
+|              | Aligned       | 10452 | 254   | 10347 | 10154 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| PRAD         | Original      | 17954 | 467   | 19034 | 19534 |
+|              | Aligned       | 10452 | 254   | 10347 | 10154 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| THCA         | Original      | 17480 | 345   | 19024 | 19532 |
+|              | Aligned       | 10452 | 254   | 10347 | 10154 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| THYM         | Original      | 18341 | 535   | 19034 | 19532 |
+|              | Aligned       | 10452 | 254   | 10347 | 10154 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| GS-COAD      | Original      | 18234 | 462   | 19023 | 19545 |
+|              | Aligned       | 11343 | 286   | 11189 | 11203 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| GS-BRCA      | Original      | 18233 | 345   | 19053 | 19533 |
+|              | Aligned       | 11343 | 286   | 11189 | 11203 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| GS-GBM       | Original      | 17545 | 335   | 19034 | 19545 |
+|              | Aligned       | 11343 | 286   | 11189 | 11203 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| GS-LGG       | Original      | 18345 | 345   | 19023 | 19534 |
+|              | Aligned       | 11343 | 286   | 11189 | 11203 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+| GS-OV        | Original      | 1735  | 244   | 19034 | 19534 |
+|              | Aligned       | 11343 | 286   | 11189 | 11203 |
+|              | Top           | 5000  | 200   | 5000  | 5000  |
+
 
 
 ## Task \& Baselines
