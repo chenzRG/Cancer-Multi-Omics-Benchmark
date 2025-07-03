@@ -280,7 +280,6 @@ Cancer multi-omics analysis always suffers from an unbalanced sample and feature
 
 
 ## Task \& Baselines
-MLOmics currently provides 20 learning tasks in three studies, including pan-cancer classification, cancer subtype identification, and omics data imputation, each with a corresponding dataset version, baseline methods, and evaluation metrics.
 
 ### Pan-cancer Classification
 
