@@ -213,10 +213,15 @@ $ ./volcano.sh <clustering_log_path> [options]
 
 MLOmics provides a collection of 20 multi-omics datasets including:
 
-- **One pan-cancer dataset** involving patients with 32 cancer types.
-- **Nine unlabeled cancer subtype datasets** including Adrenocortical Carcinoma (ACC), Kidney Renal Papillary Cell Carcinoma (KIRP), Kidney Renal Clear Cell Carcinoma (KIRC), Liver Hepatocellular Carcinoma (LIHC), Lung Adenocarcinoma (LUAD), Lung Squamous Cell Carcinoma (LUSC), Prostate Adenocarcinoma (PRAD), Thyroid Carcinoma (THCA), and Thymoma (THYM).
-- **Five labeled, golden-standard subtype datasets** corresponding to five cancers: Colon Adenocarcinoma (GS-COAD), Breast invasive carcinoma (GS-BRCA), Glioblastoma Multiforme (GS-GBM), Brain Lower Grade Glioma (GS-LGG), and Ovarian Serous Cystadenocarcinoma (GS-OV).
-- **Five TCGA data imputation datasets** include corrupted omics profiles from the above well-studied cancer types involving Imp-COAD, Imp-BRCA, Imp-GBM, Imp-LGG, and Imp-OV.
+Table: Summary of all tasks in the MLOmics under each task category.
+
+| Task Categories                        | Task Names                                           |
+|----------------------------------------|------------------------------------------------------|
+| Pan-cancer Classification              | Pan-cancer                                           |
+| Golden-standard Subtype Classification | GS-BRCA, GS-COAD, GS-GBM, GS-LGG, GS-OV              |
+| Cancer Subtype Clustering              | ACC, KIRP, KIRC, LIHC, LUAD, LUSC, PRAD, THCA, THYM  |
+| Omics Data Imputation                  | Imp-BRCA, Imp-COAD, Imp-GBM, Imp-LGG, Imp-OV         |
+
 - **Two complementary data resources** include a collected corpus from STRING and a collection of Electronic Health Records (EHR) data for cancer samples, accompanied by interactive scripts for integration.
 
 ### Multiple-Scaled Feature
