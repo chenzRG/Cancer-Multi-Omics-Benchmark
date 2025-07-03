@@ -213,14 +213,12 @@ $ ./volcano.sh <clustering_log_path> [options]
 
 MLOmics provides a collection of 20 multi-omics datasets including:
 
-Table: Summary of all tasks in the MLOmics under each task category.
-
-| Task Categories                        | Task Names                                           |
-|----------------------------------------|------------------------------------------------------|
-| Pan-cancer Classification              | Pan-cancer                                           |
-| Golden-standard Subtype Classification | GS-BRCA, GS-COAD, GS-GBM, GS-LGG, GS-OV              |
-| Cancer Subtype Clustering              | ACC, KIRP, KIRC, LIHC, LUAD, LUSC, PRAD, THCA, THYM  |
-| Omics Data Imputation                  | Imp-BRCA, Imp-COAD, Imp-GBM, Imp-LGG, Imp-OV         |
+| Task Categories                            | Task Names                                           |
+|--------------------------------------------|------------------------------------------------------|
+| Pan-cancer Classification (1)              | Pan-cancer                                           |
+| Golden-standard Subtype Classification (5) | GS-BRCA, GS-COAD, GS-GBM, GS-LGG, GS-OV              |
+| Cancer Subtype Clustering (9)              | ACC, KIRP, KIRC, LIHC, LUAD, LUSC, PRAD, THCA, THYM  |
+| Omics Data Imputation (5)                  | Imp-BRCA, Imp-COAD, Imp-GBM, Imp-LGG, Imp-OV         |
 
 - **Two complementary data resources** include a collected corpus from STRING and a collection of Electronic Health Records (EHR) data for cancer samples, accompanied by interactive scripts for integration.
 
