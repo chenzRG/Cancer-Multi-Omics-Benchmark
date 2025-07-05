@@ -18,7 +18,7 @@
 ![GitHub](https://img.shields.io/github/license/) -->
 
 
-- [MLOmics: Cancer Multi-Omics Database for Machine Learning](#MLOmics: Cancer Multi-Omics Database for Machine Learning)
+# *MLOmics*: Benchmark for Machine Learning on Cancer Multi-Omics Data
 
   - [Installations](#installations)
   - [Quick Start](#quick-start)
@@ -35,9 +35,6 @@
 
 
 -------------------
-
-# *MLOmics*: Benchmark for Machine Learning on Cancer Multi-Omics Data
-
 
 Framing the investigation of diverse cancers as a machine learning problem has recently shown significant potential in multi-omics analysis and cancer research.
 Empowering these successful machine learning models are the high-quality training datasets with sufficient data volume and adequate preprocessing.
