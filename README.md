@@ -18,7 +18,7 @@
 ![GitHub](https://img.shields.io/github/license/) -->
 
 
-# *MLOmics: Cancer Multi-Omics Database for Machine Learning
+## MLOmics: Cancer Multi-Omics Database for Machine Learning
 
   - [Installations](#installations)
   - [Quick Start](#quick-start)
