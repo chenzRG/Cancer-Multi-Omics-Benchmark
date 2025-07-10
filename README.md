@@ -96,7 +96,7 @@ MLOmics/
 │       │   └── Python/              # Deep learning models (.py files)
 │       └── Metrics/
 │           └── task_metrics.py      # Evaluation metrics for each task
-├── Dwonstream_Analysis_Tools_and_resources/                     
+├── Downstream_Analysis_Tools_and_resources/                     
 │   ├── Knowledge_bases/             # Biological knowledge bases
 │   │   ├── STRING_mapping.csv       # STRING database mapping
 │   │   └── KEGG_mapping.csv         # KEGG pathway mapping
