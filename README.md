@@ -21,9 +21,10 @@
 ## MLOmics: Cancer Multi-Omics Database for Machine Learning
 
 
-🔗Paper: https://lnkd.in/gfWnKhnH 
-⚙️Project Page: https://lnkd.in/ginESWX8
-🧪Data: https://lnkd.in/ghj5uCQX
+🔗[Paper](https://www.nature.com/articles/s41597-025-05235-x)
+⚙️[Project Page](https://chenzrg.github.io/project/mlomics)
+🤗[Hugging Face](https://huggingface.co/datasets/AIBIC/MLOmics)
+🧪[Figshare Data](https://figshare.com/articles/dataset/MLOmics_Cancer_Multi-Omics_Database_for_Machine_Learning/28729127/2)
 
 -------------------
 
