@@ -19,6 +19,10 @@
 
 
 ## MLOmics: Cancer Multi-Omics Database for Machine Learning
+🔗
+Paper: https://lnkd.in/gfWnKhnH
+Project Page: https://lnkd.in/ginESWX8
+Data: https://lnkd.in/ghj5uCQX
 
   - [Installations](#installations)
   - [Quick Start](#quick-start)
