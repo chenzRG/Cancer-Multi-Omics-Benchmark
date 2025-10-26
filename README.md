@@ -27,6 +27,8 @@
 🧪[Figshare Data](https://figshare.com/articles/dataset/MLOmics_Cancer_Multi-Omics_Database_for_Machine_Learning/28729127/2)
 
 -------------------
+🔥News: we have uploaded the subtype labels for Golden-standard Subtype Classification Tasks.
+-------------------
 
   - [Installations](#installations)
   - [Quick Start](#quick-start)
