@@ -1,0 +1,55 @@
+# MLOmics dataset config for MCluster-VAEs
+# Usage (from MCluster-VAEs directory):
+#   python main.py dataset=mlomics \
+#     dataset.dat_name=ACC \
+#     dataset.root=/path/to/Clustering_datasets/ACC \
+#     dataset.version=Top \
+#     dataset.n_clusters=2
+#
+# The 'root' should point directly to the dataset folder (e.g. .../Clustering_datasets/ACC/).
+# Filenames are built as {dat_name}_{omics}{suffix}.csv where suffix depends on version:
+#   Top      -> _top
+#   Original -> (empty)
+#   Aligned  -> _aligned
+#
+# NOTE: from_csvs() is called with T=True (default), which transposes the CSV from
+#       features x samples to samples x features before creating tensors.
+#       This is correct for the MLOmics CSV format.
+
+dat_name: "ACC"           # dataset name, e.g. ACC, KIRC, KIRP, LIHC, LUAD, LUSC, PRAD, THCA, THYM
+version: "Top"            # Top | Original | Aligned
+# root points to the version subdirectory, e.g. .../Clustering_datasets/ACC/Top/
+# run_mlomics.py sets this automatically; override manually if running main.py directly.
+root: "/path/to/Clustering_datasets/ACC/Top"   # update to actual path
+
+# csvfn: filenames relative to root.
+# For version=Top:      {dataset}_{omics}_top.csv
+# For version=Original: {dataset}_{omics}.csv
+# For version=Aligned:  {dataset}_{omics}_aligned.csv
+# run_mlomics.py sets these automatically.
+csvfn:
+  mRNA:  "ACC_mRNA_top.csv"
+  miRNA: "ACC_miRNA_top.csv"
+  CNV:   "ACC_CNV_top.csv"
+  Methy: "ACC_Methy_top.csv"
+  cli:   "survival_ACC_compat.csv"  # compatibility survival CSV written by run_mlomics.py
+
+# n_clusters must be a dict keyed by dat_name (step_data does n_clusters[dat_name])
+# Override via Hydra when running: dataset.n_clusters.ACC=2
+n_clusters:
+  ACC:  2
+  KIRC: 2
+  KIRP: 2
+  LIHC: 2
+  LUAD: 2
+  LUSC: 2
+  PRAD: 2
+  THCA: 2
+  THYM: 2
+
+# Data preprocessing
+iter_method: "loader"
+normalize: ["mRNA", "miRNA", "CNV", "Methy"]
+clip: null
+select: null
+omic_dist_kind: "normal_varconst"

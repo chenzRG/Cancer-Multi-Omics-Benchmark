@@ -159,7 +159,13 @@ def load_data(args):
     uci_path = osp.dirname(osp.abspath(inspect.getfile(inspect.currentframe())))
     #df_np = np.loadtxt(uci_path+'/raw_data/{}/data/data.txt'.format(args.data))
     print("step 1")
-    df_np = pd.read_csv('../../../Main_dataset/Imputation_datasets/{}.csv'.format(args.data), skiprows=1)
+    # MLOmics: support explicit --data_path; fallback to original relative path
+    _data_path = getattr(args, 'data_path', None)
+    if _data_path is not None:
+        _csv_file = _data_path
+    else:
+        _csv_file = '../../../Main_dataset/Imputation_datasets/{}.csv'.format(args.data)
+    df_np = pd.read_csv(_csv_file, skiprows=1)
     print("step 2")
     df_np = df_np.drop(df_np.columns[0], axis=1)
     df_y = df_np.iloc[:, -1]

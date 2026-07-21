@@ -128,7 +128,8 @@ class VAEBase(TrainerBase):
 
     @property
     def _omic_weights(self):
-        return {"rna": 1., "meth": 1., "CN": 1., "miRNA": 1., "snp": 1.}
+        # Weight each omics modality equally; keys must match dat.dims / omic CSV names.
+        return {k: 1.0 for k in self._omic_keys}
 
     @property
     def _kl_weight(self):
@@ -476,7 +477,7 @@ class MClusterVAEs(VAEBase):
 
         scores.update(clinical_metrics(preds, self._dat._meta))
 
-        # 计算entropy和conditional entropy
+        # Compute entropy and conditional entropy
         _, counts = np.unique(preds, return_counts=True)
         entr = entropy(counts, base=2)
         centr = conditional_entropy(probs)

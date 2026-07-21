@@ -6,12 +6,12 @@ current_dir=$(pwd)
 # Navigate to the specific folder
 cd ../../Baseline_and_Metric/Imputation/GAIN
 
-# 引数を取得
+# Parse arguments
 arg1=${1:-"BRCA"}  
 arg2=${2:-"CNV"}   
 arg3=${3:-0.7}     
 
-# data_name を組み立てる
+# Build data_name
 data_name="${arg1}_${arg2}"
 miss_rate="$arg3"
 

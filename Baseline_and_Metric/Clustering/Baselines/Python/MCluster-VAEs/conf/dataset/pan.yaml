@@ -1,5 +1,5 @@
 dat_name: "PAN"
-root: "/mnt/data1/share_data/TCGA/PAN2"
+root: "/path/to/PAN2"
 csvfn:
   meth: "meth.csv"
   rna: "rna.csv"
@@ -7,3 +7,8 @@ csvfn:
   miRNA: "miRNA.csv"
   cli: "clinic.csv"
 n_clusters: 32
+iter_method: "loader"
+normalize: ["meth", "rna", "CN", "miRNA"]
+clip: null
+select: null
+omic_dist_kind: "normal_varconst"

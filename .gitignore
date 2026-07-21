@@ -1,0 +1,40 @@
+# Data (downloaded separately via download.sh)
+Main_Dataset/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Results and outputs
+results/
+outputs/
+*.log
+*.keras
+*.h5
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# R
+.Rhistory
+.RData
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Personal/local config
+MLOmics Local Data.md
+
+# Local experiment / smoke artifacts
+Baseline_and_Metric/Imputation/GRAPE/uci/test/
+**/cmd_input.txt
+
+# Local tooling
+.keiji/

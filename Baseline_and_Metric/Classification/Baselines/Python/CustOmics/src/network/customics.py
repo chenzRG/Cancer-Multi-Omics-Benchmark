@@ -201,6 +201,13 @@ class CustOMICS(nn.Module):
             z = mean
             return z, loss
 
+    def _central_latent(self, x):
+        """Return the central VAE mean latent regardless of training phase."""
+        lt_rep = self.get_per_source_representation(x)
+        central_concat = torch.cat(lt_rep, dim=1)
+        mean, logvar = self.central_encoder(central_concat)
+        return mean
+
     def _train_loop(self, x, labels, os_time, os_event):
         for i in range(len(x)):
             x[i] = x[i].to(self.device)
@@ -234,9 +241,9 @@ class CustOMICS(nn.Module):
         encoded_clinical_df = clinical_df.copy()
         self.label_encoder = LabelEncoder().fit(encoded_clinical_df.loc[:, label].values)
         encoded_clinical_df.loc[:, label] = self.label_encoder.transform(encoded_clinical_df.loc[:, label].values)
-        self.one_hot_encoder = OneHotEncoder(sparse=False).fit(encoded_clinical_df.loc[:, label].values.reshape(-1,1))
+        self.one_hot_encoder = OneHotEncoder(sparse_output=False).fit(encoded_clinical_df.loc[:, label].values.reshape(-1,1))
 
-        kwargs = {'num_workers': 2, 'pin_memory': True} if self.device.type == "cuda" else {}
+        kwargs = {'num_workers': 0, 'pin_memory': self.device.type == "cuda"}
 
         lt_samples_train = get_common_samples([df for df in omics_train.values()] + [clinical_df])
         self.baseline = self._compute_baseline(clinical_df, lt_samples_train, event, surv_time)
@@ -286,7 +293,7 @@ class CustOMICS(nn.Module):
         with torch.no_grad():
             for i in range(len(x)):
                 x[i] = x[i].to(self.device)
-            z, loss = self._compute_loss(x)
+            z = self._central_latent(x)
         return z.cpu().detach().numpy()
 
     def reconstruct(self, x):
@@ -295,22 +302,24 @@ class CustOMICS(nn.Module):
         return self.autoencoders[0].decode(z).cpu().detach().numpy()
 
 
-    def plot_representation(self, omics_df, clinical_df, labels, filename, title, show=True):
+    def plot_representation(self, omics_df, clinical_df, labels, filename, title, show=False):
         labels_df = clinical_df.loc[:, labels]
         lt_samples = get_common_samples([df for df in omics_df.values()] + [clinical_df])
         z = self.get_latent_representation(omics_df=omics_df)
-        save_plot_score(filename, z, labels_df[lt_samples].values, title, show=True)
-
+        save_plot_score(filename, z, labels_df[lt_samples].values, title, show=show)
 
     def source_predict(self, expr_df, source):
         #tensor_expr = torch.Tensor(expr_df.values)
         tensor_expr = expr_df
         if source == 'CNV' or source == 'protein':
             z = self.lt_encoders[0](tensor_expr)
-        elif source == 'RNAseq' or source == 'gene_exp':
+        elif source == 'RNAseq' or source == 'gene_exp' or source == 'mRNA':
             z = self.lt_encoders[1](tensor_expr)
-        elif source == 'methyl':
+        elif source == 'methyl' or source == 'Methy':
             z = self.lt_encoders[2](tensor_expr)
+        else:
+            # Fallback: first encoder
+            z = self.lt_encoders[0](tensor_expr)
         y_pred_proba = self.classifier(z)
         return y_pred_proba
 
@@ -374,7 +383,7 @@ class CustOMICS(nn.Module):
         encoded_clinical_df = clinical_df.copy()
         encoded_clinical_df.loc[:, label] = self.label_encoder.transform(encoded_clinical_df.loc[:, label].values)
 
-        kwargs = {'num_workers': 2, 'pin_memory': True} if self.device.type == "cuda" else {}
+        kwargs = {'num_workers': 0, 'pin_memory': self.device.type == "cuda"}
 
         lt_samples_train = get_common_samples([df for df in omics_test.values()] + [clinical_df])
         dataset_test = MultiOmicsDataset(omics_df=omics_test, clinical_df=encoded_clinical_df, lt_samples=lt_samples_train,
@@ -386,7 +395,9 @@ class CustOMICS(nn.Module):
         c_index = []
         with torch.no_grad():
             for batch_idx, (x, labels, os_time, os_event) in enumerate(test_loader):
-                z, loss  = self._compute_loss(x)
+                for i in range(len(x)):
+                    x[i] = x[i].to(self.device)
+                z = self._central_latent(x)
                 if task == 'survival':
                     predicted_survival_hazard = self.survival_predictor(z)
                     predicted_survival_hazard = predicted_survival_hazard.cpu().detach().numpy().reshape(-1, 1)
@@ -474,7 +485,7 @@ class CustOMICS(nn.Module):
             plt.show()
         plt.clf()
 
-    def plot_loss(self):
+    def plot_loss(self, filename='loss_curve.png', show=False):
         n_epochs = len(self.history)
         plt.title('Evolution of the loss function with respect to the epochs')
         plt.vlines(x=self.switch_epoch, ymin=0, ymax=2.5, colors='purple', ls='--', lw=2, label='phase 2 switch')
@@ -483,7 +494,10 @@ class CustOMICS(nn.Module):
         plt.xlabel('epochs')
         plt.ylabel('loss')
         plt.legend()
-        plt.show()
+        plt.savefig(filename, bbox_inches='tight')
+        if show:
+            plt.show()
+        plt.clf()
 
     def print_parameters(self):
         lt_params = []

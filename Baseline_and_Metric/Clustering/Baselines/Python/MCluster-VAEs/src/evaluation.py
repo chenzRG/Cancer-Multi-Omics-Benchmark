@@ -1,9 +1,9 @@
 """
-推荐使用R来进行，用python实在太慢了。
-因为python中的log rank test和scipy上的检验，都是利用numpy实现的，
-底层并不是C++或fortran
+Prefer R for this; Python is much slower.
+Python log-rank / scipy tests are NumPy-backed,
+not C++/Fortran underneath.
 
-这里保留一个简单版本，便于实时评测
+Keep a simple version here for online evaluation.
 """
 
 import multiprocessing as mp
@@ -61,8 +61,8 @@ def cluster_f1(trues, preds):
 
 def cluster_f1_(trues, preds):
     """
-    其得到的结果和前一个函数一致，并且拥有更快的速度。
-    两者的速度分析在test中有:test_f1.png
+    Same results as the previous function, but faster.
+    Speed comparison is in test/test_f1.png.
     """
     tab = pd.crosstab(trues, preds).values
     a = tab.sum(axis=0)
@@ -90,8 +90,8 @@ def clinical_metrics(preds, meta_dict):
     res = {}
     if ("days" in meta_dict) and ("status" in meta_dict):
         # survival log rank test
-        # values = df[["days", "status"]].fillna(0.).values  # 来自原论文里的处理
-        # 感觉上面的处理还是有些不妥，这里改正一下
+        # values = df[["days", "status"]].fillna(0.).values  # original paper approach
+        # Prefer a safer handling than fillna(0) above
         surv = pd.DataFrame({"days": meta_dict["days"],
                              "status": meta_dict["status"]})
         ind = surv[["days", "status"]].notna().all(axis=1).values
@@ -111,17 +111,17 @@ def clinical_metrics(preds, meta_dict):
         if col not in meta_dict:
             continue
         cli_var = meta_dict[col]
-        # 临床特征中可能存在缺失值
+        # Clinical features may contain missing values
         ind = pd.isnull(cli_var)
         if ind.all():
-            # 如果一个临床特征全是NaN，则跳过
+            # Skip clinical features that are all-NaN
             continue
         clu_var_nona, cli_var_nona = preds[~ind], cli_var[~ind]
         if col.startswith("age"):
-            # 只有age去做kwh
+            # Only age uses Kruskal-Wallis
             res[col] = kwh_pvalue(cli_var_nona, clu_var_nona)
         else:
-            # 如果临床特征达不到2类及以上，则跳过
+            # Skip clinical features with fewer than 2 categories
             if np.unique(cli_var_nona).shape[0] >= 2:
                 res[col] = chi2_pvalue(cli_var_nona, clu_var_nona)
 

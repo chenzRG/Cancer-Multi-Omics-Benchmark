@@ -53,8 +53,8 @@ class EarlyStopping:
         delta (float):
             Minimum change in the monitored quantity to qualify as improvement.
             Default: 0
-            如果是>0，则表示需要提高更多才算是improvement；如果是<0，则只要不落后
-            太多就算是improvement
+            If >0, a larger gain is required to count as improvement; if <0, not falling
+            behind by too much still counts as improvement
         """
         self.patience = patience
         self.verbose = verbose

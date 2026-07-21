@@ -46,17 +46,18 @@ def main (args):
   
   data_name = args.data_name
   miss_rate = args.miss_rate
-  
+  data_path = args.data_path if args.data_path else None  # MLOmics: explicit CSV path (optional)
+
   gain_parameters = {'batch_size': args.batch_size,
                      'hint_rate': args.hint_rate,
                      'alpha': args.alpha,
                      'iterations': args.iterations}
-  
+
   # Load data and introduce missingness
   print("\n")
   print(data_name)
   print("\n")
-  ori_data_x, miss_data_x, data_m = data_loader(data_name, miss_rate)
+  ori_data_x, miss_data_x, data_m = data_loader(data_name, miss_rate, data_path=data_path)  # MLOmics: pass data_path
   
   # Impute missing data
   imputed_data_x = gain(miss_data_x, gain_parameters)
@@ -78,6 +79,11 @@ if __name__ == '__main__':
   parser.add_argument(
       '--data_name',
       default='BCRA_CNV',
+      type=str)
+  parser.add_argument(
+      '--data_path',
+      help='MLOmics: explicit path to the CSV file; overrides default path construction',  # MLOmics
+      default=None,
       type=str)
   parser.add_argument(
       '--miss_rate',

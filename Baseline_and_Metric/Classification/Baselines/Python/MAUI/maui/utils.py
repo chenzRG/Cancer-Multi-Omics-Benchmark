@@ -6,7 +6,7 @@ import keras
 import numpy as np
 import pandas as pd
 from scipy import stats
-from scipy import interp
+from numpy import interp  # scipy.interp removed in scipy 1.14; numpy.interp is equivalent
 from scipy import spatial
 from scipy import cluster
 from collections import Counter

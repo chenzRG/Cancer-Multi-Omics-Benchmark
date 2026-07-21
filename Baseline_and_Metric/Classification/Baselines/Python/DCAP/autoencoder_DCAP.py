@@ -1,10 +1,22 @@
 
+# MLOmics: added argparse so input/output paths are passed as CLI arguments
+# Usage: python autoencoder_DCAP.py --data_path /path/to/brcatest_go.csv --output_path /path/to/fea.csv
+import argparse  # MLOmics
 
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-with open(r"C:\pypro\brcatest_go.csv", 'r') as f:
+
+# MLOmics: parse CLI arguments
+_parser = argparse.ArgumentParser()  # MLOmics
+_parser.add_argument('--data_path', default='brcatest_go.csv',  # MLOmics: was hardcoded
+                     help='MLOmics: path to preprocessed input CSV (output of Data_preprocessing.R)')
+_parser.add_argument('--output_path', default='fea.csv',  # MLOmics: was hardcoded
+                     help='MLOmics: path where the encoder feature CSV will be saved')
+_args = _parser.parse_args()  # MLOmics
+
+with open(_args.data_path, 'r') as f:  # MLOmics: path from --data_path
     data = pd.read_csv(f)
 
 print(data.shape)
@@ -107,7 +119,7 @@ with tf.Session() as sess:
                 fea_output = sess.run([encoder_op], feed_dict={X: tcga_input})
                 # print(fea_output)
                 print(np.array(fea_output).shape)
-                np.savetxt(r'C:\pypro\fea.csv', np.array(fea_output[0]), delimiter=',')
+                np.savetxt(_args.output_path, np.array(fea_output[0]), delimiter=',')  # MLOmics: path from --output_path
     print("Optimization Finished!")
 
 

@@ -33,7 +33,7 @@ class MultiOmicsDataset:
 
     def __init__(self, arrd: Dict[str, np.ndarray], **meta) -> None:
 
-        # 所有的arr需要有相同的shape0
+        # All arrays must share the same shape[0]
         self._k1 = list(arrd.keys())[0]
         self._s1 = arrd[self._k1].shape[0]
         assert all([arr.shape[0] == self._s1 for arr in arrd.values()])
@@ -134,9 +134,9 @@ class MultiOmicsDataset:
                   "sample_id": dfs[k1].index.values}
         if clin_fn is not None:
             kwargs["varnames"] = clin_use_columns + ["sample_id"]
-            # 保证样本排序是相同的
-            # 这里使用reindex，可以保证就算有的样本在data中，而不在clinic中，
-            #   也不会报错，这一步samples会被填补为NaN
+            # Keep sample order aligned
+            # reindex keeps samples present in data but missing in clinic
+            #   without raising; missing clinic rows become NaN
             clin_df = pd.read_csv(clin_fn, index_col=0).reindex(dfs[k1].index)
             for column in clin_use_columns:
                 kwargs[column] = clin_df[column].values
@@ -163,7 +163,7 @@ class MultiOmicsDataset:
             raise NotImplementedError
 
     def batch_iterator_random(self, batch_size):
-        # 来自SubtypeGAN的实现，其每个epoch其实就是随机取的一个batch
+        # From SubtypeGAN: each epoch is effectively one random batch
         return Iterator(1, self._arrs, self.__len__(), batch_size)
 
     def batch_iterator_loader(
@@ -174,11 +174,11 @@ class MultiOmicsDataset:
         shuffle: bool = True,
         pin_memory: bool = True
     ):
-        # 正常的Deep Learing训练iteraion
-        # 使用drop_last，则之后记录每个批次大小的时候就可以直接使用bs，而无需
-        # 每次取用x.size(0)，更加重要的是，产生valid和fake标签tensor可以放在循环
-        # 外面，加快了速度
-        # TODO: 但是这样每次训练都少了一部分样本，其带来的影响未知，但应该是非常有限的
+        # Standard deep-learning training iteration
+        # With drop_last, batch size is always bs (no need for x.size(0));
+        # more importantly, valid/fake label tensors can be created outside
+        # the loop for speed
+        # TODO: drop_last skips a few samples each epoch; impact should be small
         dataloader = DataLoader(self, batch_size=batch_size, shuffle=shuffle,
                                 num_workers=num_worker, pin_memory=pin_memory,
                                 drop_last=drop_last)

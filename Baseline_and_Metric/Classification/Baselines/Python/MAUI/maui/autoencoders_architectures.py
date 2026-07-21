@@ -6,9 +6,31 @@ import numpy as np
 import tensorflow as tf
 from keras.models import Model
 from keras import backend as K
+import tensorflow as _tf_backend
+import keras as _keras_ops
+# Keras 2 → Keras 3 backend shims (K.* functions removed from keras.backend in Keras 3)
+# Use keras.ops where possible so shims work inside Lambda layers (symbolic KerasTensors).
+if not hasattr(K, 'variable'):
+    K.variable = lambda val, name=None, **kw: _tf_backend.Variable(val, name=name, dtype='float32')
+if not hasattr(K, 'shape'):
+    K.shape = _keras_ops.ops.shape
+if not hasattr(K, 'exp'):
+    K.exp = _keras_ops.ops.exp
+if not hasattr(K, 'square'):
+    K.square = _keras_ops.ops.square
+if not hasattr(K, 'sum'):
+    K.sum = _keras_ops.ops.sum
+if not hasattr(K, 'mean'):
+    K.mean = _keras_ops.ops.mean
+if not hasattr(K, 'random_normal'):
+    K.random_normal = lambda shape, mean=0.0, stddev=1.0, seed=None, **kw: _keras_ops.random.normal(shape=shape, mean=mean, stddev=stddev)
+if not hasattr(K, 'get_value'):
+    K.get_value = lambda x: float(x.numpy()) if hasattr(x, 'numpy') else float(x)
+if not hasattr(K, 'set_value'):
+    K.set_value = lambda x, v: x.assign(v)
 from keras.callbacks import Callback
 from keras import metrics, optimizers
-from keras.layers.normalization import BatchNormalization
+from keras.layers import BatchNormalization  # keras.layers.normalization removed in Keras 3
 from keras.layers import Input, Dense, Lambda, Activation
 
 
@@ -94,16 +116,9 @@ def stacked_vae(
 
     # Function for reparameterization trick to make model differentiable
     def sampling(args):
-        import tensorflow as tf
-
-        # Function with args required for Keras Lambda function
         z_mean, z_log_var = args
-
-        # Draw epsilon of the same shape from a standard normal distribution
-        epsilon = K.random_normal(shape=tf.shape(z_mean), mean=0.0, stddev=epsilon_std)
-
-        # The latent vector is non-deterministic and differentiable
-        # in respect to z_mean and z_log_var
+        # K.shape uses keras.ops.shape — works on both KerasTensors (symbolic) and eager tensors
+        epsilon = K.random_normal(shape=K.shape(z_mean), mean=0.0, stddev=epsilon_std)
         z = z_mean + K.exp(z_log_var / 2) * epsilon
         return z
 
@@ -210,18 +225,9 @@ def stacked_vae(
         name="reconstruction",
     )(h)
 
-    adam = optimizers.Adam(lr=learning_rate)
-    vae = Model(rnaseq_input, reconstruction)
-    reconstruction_loss = original_dim * metrics.binary_crossentropy(
-        rnaseq_input, reconstruction
-    )
-    kl_loss = -0.5 * K.sum(
-        1 + l_log_var_encoded - K.square(l_mean_encoded) - K.exp(l_log_var_encoded),
-        axis=-1,
-    )
-    vae_loss = K.mean(reconstruction_loss + (K.get_value(beta) * kl_loss))
-    vae.add_loss(vae_loss)
-    vae.compile(optimizer=adam)
+    adam = optimizers.Adam(learning_rate=learning_rate)  # 'lr' renamed to 'learning_rate' in Keras 3
+    _vae_base = Model(rnaseq_input, reconstruction)
+    _z_params  = Model(rnaseq_input, [l_mean_encoded, l_log_var_encoded])
 
     # non-sampling encoder
     encoder = Model(rnaseq_input, encoder_target)
@@ -229,13 +235,54 @@ def stacked_vae(
     # sampling encoder
     sampling_encoder = Model(rnaseq_input, l)
 
-    # Also, create a decoder model
+    # decoder model — built before wrapping vae, uses _vae_base.layers
     encoded_input = Input(shape=(latent_dim,))
     prev = encoded_input
     if hidden_dims:
         for i in reversed(range(len(hidden_dims) + 1)):
-            prev = vae.layers[-(i + 1)](prev)
+            prev = _vae_base.layers[-(i + 1)](prev)
     decoder = Model(encoded_input, prev)
+
+    # Keras 3 functional models don't support add_loss() outside call().
+    # Wrap with a custom train_step / test_step that recomputes the VAE loss.
+    _orig_dim = original_dim
+    _beta_ref  = beta
+
+    class _VAETrainable(_keras_ops.Model):
+        def __init__(self, **kw):
+            super().__init__(**kw)
+            # Register sub-models so Keras tracks their trainable_variables
+            self._vae_m = _vae_base
+            self._z_m   = _z_params
+
+        def call(self, x, training=None):
+            return self._vae_m(x, training=training)
+
+        def _compute_loss(self, x):
+            import tensorflow as _tf_vae
+            recon = self._vae_m(x, training=True)
+            _zm, _zlv = self._z_m(x, training=True)
+            _recon = float(_orig_dim) * metrics.binary_crossentropy(x, recon)
+            _kl = -0.5 * K.sum(
+                1 + _zlv - K.square(_zm) - K.exp(_zlv), axis=-1)
+            return K.mean(_recon + _beta_ref * _kl)
+
+        def train_step(self, data):
+            import tensorflow as _tf_vae
+            x = data[0] if isinstance(data, (list, tuple)) else data
+            with _tf_vae.GradientTape() as tape:
+                loss = self._compute_loss(x)
+            grads = tape.gradient(loss, self.trainable_variables)
+            self.optimizer.apply_gradients(zip(grads, self.trainable_variables))
+            return {'loss': loss}
+
+        def test_step(self, data):
+            x = data[0] if isinstance(data, (list, tuple)) else data
+            loss = self._compute_loss(x)
+            return {'loss': loss}
+
+    vae = _VAETrainable()
+    vae.compile(optimizer=adam)
 
     return vae, encoder, sampling_encoder, decoder, beta
 
@@ -296,13 +343,8 @@ def deep_vae(
         hidden_dims = [300]
     # Function for reparameterization trick to make model differentiable
     def sampling(args):
-        # Function with args required for Keras Lambda function
         z_mean, z_log_var = args
-
-        # Draw epsilon of the same shape from a standard normal distribution
-        epsilon = K.random_normal(shape=tf.shape(z_mean), mean=0.0, stddev=epsilon_std)
-        # The latent vector is non-deterministic and differentiable
-        # in respect to z_mean and z_log_var
+        epsilon = K.random_normal(shape=K.shape(z_mean), mean=0.0, stddev=epsilon_std)
         z = z_mean + K.exp(z_log_var / 2) * epsilon
         return z
 
@@ -400,19 +442,9 @@ def deep_vae(
         name="reconstruction",
     )(h)
 
-    adam = optimizers.Adam(lr=learning_rate)
-    vae = Model(rnaseq_input, reconstruction)
-
-    reconstruction_loss = original_dim * metrics.binary_crossentropy(
-        rnaseq_input, reconstruction
-    )
-    kl_loss = -0.5 * K.sum(
-        1 + l_log_var_encoded - K.square(l_mean_encoded) - K.exp(l_log_var_encoded),
-        axis=-1,
-    )
-    vae_loss = K.mean(reconstruction_loss + (K.get_value(beta) * kl_loss))
-    vae.add_loss(vae_loss)
-    vae.compile(optimizer=adam)
+    adam = optimizers.Adam(learning_rate=learning_rate)  # 'lr' renamed to 'learning_rate' in Keras 3
+    _vae_base = Model(rnaseq_input, reconstruction)
+    _z_params  = Model(rnaseq_input, [l_mean_encoded, l_log_var_encoded])
 
     # non-sampling encoder
     encoder = Model(rnaseq_input, encoder_target)
@@ -420,12 +452,45 @@ def deep_vae(
     # sampling encoder
     sampling_encoder = Model(rnaseq_input, l)
 
-    # Also, create a decoder model
+    # decoder model — built before wrapping vae, uses _vae_base.layers
     encoded_input = Input(shape=(latent_dim,))
     prev = encoded_input
     if hidden_dims:
         for i in reversed(range(len(hidden_dims) + 1)):
-            prev = vae.layers[-(i + 1)](prev)
+            prev = _vae_base.layers[-(i + 1)](prev)
     decoder = Model(encoded_input, prev)
+
+    # Keras 3 functional models don't support add_loss() outside call().
+    _orig_dim = original_dim
+    _beta_ref  = beta
+
+    class _VAETrainable(_keras_ops.Model):
+        def call(self, x, training=None):
+            return _vae_base(x, training=training)
+
+        def _compute_loss(self, x):
+            recon = _vae_base(x, training=True)
+            _zm, _zlv = _z_params(x, training=True)
+            _recon = float(_orig_dim) * metrics.binary_crossentropy(x, recon)
+            _kl = -0.5 * K.sum(
+                1 + _zlv - K.square(_zm) - K.exp(_zlv), axis=-1)
+            return K.mean(_recon + _beta_ref * _kl)
+
+        def train_step(self, data):
+            import tensorflow as _tf_vae
+            x = data[0] if isinstance(data, (list, tuple)) else data
+            with _tf_vae.GradientTape() as tape:
+                loss = self._compute_loss(x)
+            grads = tape.gradient(loss, self.trainable_variables)
+            self.optimizer.apply_gradients(zip(grads, self.trainable_variables))
+            return {'loss': loss}
+
+        def test_step(self, data):
+            x = data[0] if isinstance(data, (list, tuple)) else data
+            loss = self._compute_loss(x)
+            return {'loss': loss}
+
+    vae = _VAETrainable()
+    vae.compile(optimizer=adam)
 
     return vae, encoder, sampling_encoder, decoder, beta

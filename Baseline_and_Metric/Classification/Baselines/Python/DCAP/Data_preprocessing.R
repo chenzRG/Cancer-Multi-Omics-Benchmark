@@ -1,6 +1,14 @@
-setwd('D:/brca')
+# MLOmics: accept command-line arguments so this script is not hardcoded to Windows paths
+# Usage: Rscript Data_preprocessing.R <work_dir> <input_csv> <output_csv>
+# Example: Rscript Data_preprocessing.R /data/brca brca_multitest.csv brcatest_go.csv
+args <- commandArgs(trailingOnly = TRUE)
+work_dir   <- if (length(args) >= 1) args[1] else 'D:/brca'           # MLOmics: default kept for backward compat
+input_csv  <- if (length(args) >= 2) args[2] else 'brca_multitest.csv'  # MLOmics
+output_csv <- if (length(args) >= 3) args[3] else 'brcatest_go.csv'     # MLOmics
+
+setwd(work_dir)  # MLOmics: was hardcoded 'D:/brca'
 library('imputeMissings')
-data=read.csv("brca_multitest.csv",row.names = 1)
+data=read.csv(input_csv, row.names = 1)  # MLOmics: was hardcoded "brca_multitest.csv"
 
 #################delete missing#######################
 sum(is.na(data))
@@ -30,5 +38,5 @@ data6=data5
 data7=t(data6)
 data8=scale(data7, center = T, scale = T)
 data9=t(data8)
-write.csv(data9,'brcatest_go.csv')
+write.csv(data9, output_csv)  # MLOmics: was hardcoded 'brcatest_go.csv'
 
