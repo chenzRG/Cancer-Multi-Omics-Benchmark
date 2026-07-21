@@ -1,61 +1,47 @@
+"""Clustering metrics for MLOmics (SIL / LPS)."""
+from __future__ import annotations
+
+from typing import Any, Dict, Optional, Sequence, Union
+
 import numpy as np
-import pandas as pd
-from sklearn.metrics import silhouette_score
 from lifelines.statistics import multivariate_logrank_test
+from sklearn.metrics import silhouette_score
 
-def clustering_metrics(y_pred, X, survival_times, event_observed):
-#     Calculate SIL and LPS scores.
-    
-#     Parameters:
-#     y_pred (array-like): Predicted labels or cluster labels
-#     X (array-like): Feature matrix (required for SIL calculation)
-#     survival_times (array-like): Survival times
-#     event_observed (array-like): Event observed (1 if event happened, 0 if censored)
-    
-#     Returns:
-#     dict: Dictionary containing SIL and LPS scores
+ArrayLike = Union[Sequence[Any], np.ndarray]
 
-    metrics = {}
-    
-    # Calculate SIL
-    if X is not None and len(np.unique(y_pred)) > 1:
-        metrics['sil'] = silhouette_score(X, y_pred)
-    
-    # Calculate LPS for more than two groups
-    if survival_times is not None and event_observed is not None and y_pred is not None:
-        if len(np.unique(y_pred)) > 1:
-            results = multivariate_logrank_test(survival_times, y_pred, event_observed)
-            metrics['lps'] = results.p_value
-        else:
-            metrics['lps'] = 'N/A'  # Not enough groups to perform log-rank test
-    
+
+def clustering_metrics(
+    y_pred: ArrayLike,
+    X: Optional[ArrayLike] = None,
+    survival_times: Optional[ArrayLike] = None,
+    event_observed: Optional[ArrayLike] = None,
+) -> Dict[str, Any]:
+    """Return silhouette (SIL) and log-rank p-value (LPS) when applicable."""
+    metrics: Dict[str, Any] = {}
+    y_pred_arr = np.asarray(y_pred)
+    n_groups = len(np.unique(y_pred_arr))
+
+    if X is not None and n_groups > 1:
+        metrics["sil"] = float(silhouette_score(np.asarray(X), y_pred_arr))
+
+    if (
+        survival_times is not None
+        and event_observed is not None
+        and n_groups > 1
+    ):
+        results = multivariate_logrank_test(
+            survival_times, y_pred_arr, event_observed
+        )
+        metrics["lps"] = float(results.p_value)
+    elif survival_times is not None and event_observed is not None:
+        metrics["lps"] = "N/A"
+
     return metrics
 
-# Example data
-# y_pred = [0, 1, 0, 1, 2, 2, 1, 0, 2, 1]
-# X = [
-#     [1.0, 2.0],
-#     [1.5, 1.8],
-#     [1.1, 2.2],
-#     [1.2, 1.9],
-#     [3.0, 3.2],
-#     [3.1, 3.1],
-#     [3.2, 3.3],
-#     [1.0, 2.1],
-#     [3.0, 3.0],
-#     [3.1, 3.4]
-# ]
-# survival_times = [10, 15, 10, 20, 30, 25, 35, 10, 40, 30]
-# event_observed = [1, 0, 1, 1, 0, 1, 0, 1, 0, 1]
 
-# Reading data from CSV files
-clustering_result = pd.read_csv('clustering_result.csv')
-survival_data = pd.read_csv('survival_data.csv')
-feature_data = pd.read_csv('feature_data.csv')
-y_pred = clustering_result['y_pred'].values
-X = feature_data[['feature1', 'feature2']].values
-survival_times = survival_data['survival_times'].values
-event_observed = survival_data['event_observed'].values
-
-metrics = clustering_metrics(y_pred, X, survival_times, event_observed)
-print(metrics)
+if __name__ == "__main__":
+    y_pred = [0, 1, 0, 1, 2, 2, 1, 0, 2, 1]
+    X = np.random.default_rng(0).normal(size=(10, 2))
+    survival_times = [10, 15, 10, 20, 30, 25, 35, 10, 40, 30]
+    event_observed = [1, 0, 1, 1, 0, 1, 0, 1, 0, 1]
+    print(clustering_metrics(y_pred, X, survival_times, event_observed))

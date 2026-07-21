@@ -1,5 +1,5 @@
 dat_name: "BRCA"
-root: "/mnt/data1/share_data/TCGA/SubtypeGAN/${dataset.dat_name}"
+root: "/path/to/SubtypeGAN/${dataset.dat_name}"
 csvfn:
   meth: "meth.csv"
   rna: "rna.csv"
@@ -17,3 +17,8 @@ n_clusters:
   STAD: 3
   UCEC: 4
   UVM: 4
+iter_method: "loader"
+normalize: ["meth", "rna", "CN", "miRNA"]
+clip: null
+select: null
+omic_dist_kind: "normal_varconst"

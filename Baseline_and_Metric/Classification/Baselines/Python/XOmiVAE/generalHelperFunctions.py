@@ -14,6 +14,35 @@ def loadData(input_path):
     label_array = label['tumour_type'].to_numpy()
     return class_num, label_array, sample_id
 
+
+# MLOmics: alternative loader for GS classification datasets
+def loadData_mlomics(dataset='GS-BRCA', version='Top', data_root=None):
+    """
+    Load an MLOmics GS-* dataset for XOmiVAE.
+
+    Returns
+    -------
+    class_num   : int
+    label_array : np.ndarray  (n_samples,)
+    sample_id   : list of str
+    omics_dict  : dict {omics_name: np.ndarray(n_samples, n_features)}
+    """
+    import sys, os as _os
+    _here = _os.path.dirname(_os.path.abspath(__file__))
+    _proj_root = _os.path.abspath(_os.path.join(_here, '..', '..', '..', '..', '..'))
+    if _proj_root not in sys.path:
+        sys.path.insert(0, _proj_root)
+    from utils.data_loader import MLOmicsLoader
+    _root = data_root or _os.environ.get('MLOMICS_DATA_ROOT', '')
+    loader = MLOmicsLoader(_root)
+    label_array = loader.load_labels(dataset, version=version)
+    class_num   = len(set(label_array.tolist()))
+    sample_id   = loader.get_sample_names(dataset, version=version)
+    omics_raw   = loader.load_omics(dataset, version=version)
+    # XOmiVAE expects (n_samples, n_features)
+    omics_dict  = {k: df.T.values for k, df in omics_raw.items()}
+    return class_num, label_array, sample_id, omics_dict
+
 def processPhenotypeDataForSamples(sample_id):
     phenotype = pd.read_csv('DataSources/GDC-PANCAN.basic_phenotype.tsv', sep='\t', header=0, index_col=0)
     phenotype = phenotype.T

@@ -124,7 +124,7 @@ class GatedAttetionModule(nn.Module):
         return res
 
 
-# 会报错，因为GRU只能在train mode下运行
+# Would error because GRU only runs in train mode
 # class GRUModule(nn.Module):
 
 #     def __init__(self, inp, hidden=50, dropout=0.5):

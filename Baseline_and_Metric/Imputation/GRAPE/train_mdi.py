@@ -75,7 +75,7 @@ def main():
         data = load_data(args)
 
     log_path = './{}/test/{}/{}/'.format(args.domain,args.data,args.log_dir)
-    os.makedirs(log_path)
+    os.makedirs(log_path, exist_ok=True)
 
     cmd_input = 'python ' + ' '.join(sys.argv) + '\n'
     with open(osp.join(log_path, 'cmd_input.txt'), 'a') as f:

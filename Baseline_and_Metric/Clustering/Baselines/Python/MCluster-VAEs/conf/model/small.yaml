@@ -10,11 +10,8 @@ gumbel_reparam: true
 y_gen: true
 
 omic_enc_hiddens: [250]
-omic_n_latents:
-  rna: 100
-  CN: 100
-  meth: 100
-  miRNA: 30
+# Scalar: expanded per omics key from dat.dims (supports MLOmics mRNA/miRNA/CNV/Methy)
+omic_n_latents: 100
 omic_dec_hiddens: [100]
 omic_enc_inject: true
 omic_dec_inject: false

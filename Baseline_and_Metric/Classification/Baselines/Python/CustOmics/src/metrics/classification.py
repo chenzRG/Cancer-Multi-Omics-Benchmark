@@ -20,18 +20,24 @@ from sklearn.metrics import roc_auc_score, roc_curve, auc
 from sklearn.preprocessing import OneHotEncoder
 
 def roc_auc_score_multiclass(y_true, y_pred, ohe, average = "macro"):
-    y_true = ohe.transform(np.array(y_true).reshape(-1,1))
-
-    roc_auc = roc_auc_score(y_true, y_pred, average = average, multi_class='ovo')
-
-    return roc_auc
+    y_true_arr = np.asarray(y_true).reshape(-1)
+    # ROC-AUC is undefined when a fold contains fewer than two classes
+    if len(np.unique(y_true_arr)) < 2:
+        return float('nan')
+    y_true_ohe = ohe.transform(y_true_arr.reshape(-1, 1))
+    try:
+        return float(
+            roc_auc_score(y_true_ohe, y_pred, average=average, multi_class='ovo')
+        )
+    except ValueError:
+        return float('nan')
 
 def multi_classification_evaluation(y_true, y_pred, y_pred_proba, average='weighted', save_confusion=False, filename=None, plot_roc=False, ohe=None):
     accuracy = metrics.accuracy_score(y_true, y_pred)
-    precision = metrics.precision_score(y_true, y_pred, average=average)
-    recall = metrics.recall_score(y_true, y_pred, average = average)
-    f1_score = metrics.f1_score(y_true, y_pred, average = average)
-    auc = roc_auc_score_multiclass(y_true, y_pred_proba, ohe, average = average)
+    precision = metrics.precision_score(y_true, y_pred, average=average, zero_division=0)
+    recall = metrics.recall_score(y_true, y_pred, average=average, zero_division=0)
+    f1_score = metrics.f1_score(y_true, y_pred, average=average, zero_division=0)
+    auc = roc_auc_score_multiclass(y_true, y_pred_proba, ohe, average=average)
     dt_scores = {'Accuracy': accuracy,
                 'F1-score' : f1_score,
                 'Precision' : precision,
@@ -102,7 +108,3 @@ def plot_roc_multiclass(y_test, y_pred_proba, filename="", n_classes=2, var_name
     plt.legend(loc="lower right")
     if (filename != ""): plt.savefig("roc_multi_{}.png".format(filename))
     #else: #plt.show()
-
-
-
-    

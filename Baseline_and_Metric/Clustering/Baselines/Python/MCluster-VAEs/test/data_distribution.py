@@ -4,8 +4,8 @@ import pandas as pd
 import seaborn as sns
 
 
-data_dir = "/mnt/data1/share_data/TCGA/data_for_cluster/pancancer/fea/"
-# clin_dir = "/mnt/data1/share_data/TCGA/data_for_cluster/pancancer/clinic/"
+data_dir = "/path/to/pancancer/fea/"
+# clin_dir = "/path/to/pancancer/clinic/"
 
 dfall = []
 for n in ["meth", "rna", "CN", "miRNA"]:

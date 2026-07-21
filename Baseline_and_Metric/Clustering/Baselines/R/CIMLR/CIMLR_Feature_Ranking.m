@@ -4,7 +4,7 @@ function [aggR,pval] = CIMLR_Feature_Ranking(A,X)
 %%% X is the data of size nxp
 
 %%%glist is the ranking of genes
-%addpath('/Users/Bo/Documents/PHD_in_Stanford/Work_Serafim/SingleCell/GB_similaritylearning/RankAggreg')
+%addpath('/path/to/RankAggreg')
 for i = 1:100
     i
     index = randperm(length(A));

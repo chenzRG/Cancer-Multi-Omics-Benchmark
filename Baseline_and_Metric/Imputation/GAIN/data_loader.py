@@ -21,21 +21,29 @@ from utils import binary_sampler
 from keras.datasets import mnist
 
 
-def data_loader (data_name, miss_rate):
+def data_loader (data_name, miss_rate, data_path=None):  # MLOmics: added data_path argument
   '''Loads datasets and introduce missingness.
-  
+
   Args:
     - data_name: letter, spam, or mnist
     - miss_rate: the probability of missing components
-    
+    - data_path: (MLOmics) explicit path to the CSV file; if provided,
+                 overrides the default relative path construction.
+                 Use this to load MLOmics imputation datasets directly.
+
   Returns:
     data_x: original data
     miss_data_x: data with missing values
     data_m: indicator matrix for missing components
   '''
-  
+
   # Load data
-  file_name = '../../../Main_Dataset/Imputation_datasets/Imp-'+data_name.split("_")[0]+'/Top/'+data_name+'.csv'
+  # MLOmics: if data_path is supplied, use it directly; otherwise fall back to
+  #          the original relative path (backward-compatible with letter/spam).
+  if data_path is not None:  # MLOmics: explicit path
+    file_name = data_path  # MLOmics: e.g. '/path/to/Main_Dataset/.../BRCA_mRNA.csv'
+  else:
+    file_name = '../../../Main_Dataset/Imputation_datasets/Imp-'+data_name.split("_")[0]+'/Top/'+data_name+'.csv'
   data_x = np.genfromtxt(file_name, delimiter=',', dtype=str)[1:,1:].astype(float)
 
   # Parameters

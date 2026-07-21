@@ -259,4 +259,3 @@ dependencies:
     - antlr4-python3-runtime==4.9.3
     - hydra-core==1.2.0
     - omegaconf==2.2.2
-prefix: /home/rongzhiwei/miniconda3/envs/mcluster

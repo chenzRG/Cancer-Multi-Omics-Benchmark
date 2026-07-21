@@ -153,7 +153,7 @@ class SubtypeGANCluster(AAEBase):
             inpts, omic_oupts, (n_clusters, latent_dim, latent_dim),
             omic_hiddens, enc_hiddens, att_method
         )
-        # TODO: 尝试一下共享参数的情况
+        # TODO: try shared-parameter setting
         self.decoder = block.Decoder(self._dec_inp_dim, inpts, dec_hiddens)
         self.cat_disc = block.Discriminator(n_clusters,
                                             disc_dropout,
@@ -198,7 +198,7 @@ class SubtypeGANCluster(AAEBase):
             # torch.eye(
             #     self._cate_dim, dtype=torch.float, device=self._device
             # )[torch.randint(self._cate_dim, size=(z.size(0),))]
-            # 使用sample cate保证了训练cate discriminator时两种样本的相似性
+            # sample cate keeps the two sample types similar when training the cate discriminator
             rsample_categorical(
                 torch.full_like(logits, 1/logits.size(1)), self._temp
             )
@@ -296,7 +296,7 @@ class SubtypeWGANCluster(SubtypeGANCluster):
         # torch.eye(
         #     self._cate_dim, dtype=torch.float, device=self._device
         # )[torch.randint(self._cate_dim, size=(z.size(0),))]
-        # 使用sample cate保证了训练cate discriminator时两种样本的相似性
+        # sample cate keeps the two sample types similar when training the cate discriminator
         y_real = rsample_categorical(
             torch.full_like(logits, 1/logits.size(1)),
             self._temp
@@ -390,7 +390,7 @@ class SubtypeGANCat(AAEBase):
             # torch.eye(
             #     self._cate_dim, dtype=torch.float, device=self._device
             # )[torch.randint(self._cate_dim, size=(z.size(0),))]
-            # 使用sample cate保证了训练cate discriminator时两种样本的相似性
+            # sample cate keeps the two sample types similar when training the cate discriminator
             rsample_categorical(
                 torch.full_like(logits, 1/logits.size(1)), self._temp
             ), True, False

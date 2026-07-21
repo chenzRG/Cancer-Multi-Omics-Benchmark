@@ -18,23 +18,51 @@ from sklearn import preprocessing
 from sklearn.cluster import KMeans, SpectralClustering, AgglomerativeClustering
 from sklearn import mixture
 from keras import backend as K
+# Keras 2 → Keras 3 backend shims
+import tensorflow as _tf_k_shim
+import keras as _keras_ops_shim
+if not hasattr(K, 'shape'):
+    K.shape = _keras_ops_shim.ops.shape
+if not hasattr(K, 'int_shape'):
+    K.int_shape = lambda x: tuple(d for d in x.shape)
+if not hasattr(K, 'random_normal'):
+    K.random_normal = lambda shape, mean=0.0, stddev=1.0, seed=None, **kw: _keras_ops_shim.random.normal(shape=shape, mean=mean, stddev=stddev)
+if not hasattr(K, 'exp'):
+    K.exp = _keras_ops_shim.ops.exp
+if not hasattr(K, 'square'):
+    K.square = _keras_ops_shim.ops.square
+if not hasattr(K, 'sum'):
+    K.sum = _keras_ops_shim.ops.sum
+if not hasattr(K, 'mean'):
+    K.mean = _keras_ops_shim.ops.mean
 from keras.layers import Input, Dense, Lambda, Layer, Add, BatchNormalization, Dropout, Activation, Conv2D, \
     MaxPooling2D, Activation, LeakyReLU, concatenate
 from keras.models import Model, Sequential
-from keras.losses import mse, binary_crossentropy
+from keras.losses import binary_crossentropy
+import tensorflow as _tf_for_mse
+def mse(y_true, y_pred):  # keras.losses.mse removed in Keras 3
+    return _tf_for_mse.reduce_mean(_tf_for_mse.square(y_pred - y_true), axis=-1)
 from keras.optimizers import Adam
 from sklearn.ensemble import RandomForestClassifier
 from keras.models import load_model
-from keras.utils.generic_utils import get_custom_objects
+try:
+    from keras.utils.generic_utils import get_custom_objects  # Keras 2
+except ImportError:
+    from keras.utils import get_custom_objects  # Keras 3
 from itertools import combinations
 import bisect
 
 random.seed(1)
 np.random.seed(1)
-tf.set_random_seed(1)
-session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
-sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
-K.set_session(sess)
+# TF1 compat: set_random_seed / Session / set_session removed in Keras 3 + TF2
+try:
+    tf.set_random_seed(1)
+    session_conf = tf.ConfigProto(intra_op_parallelism_threads=1, inter_op_parallelism_threads=1)
+    sess = tf.Session(graph=tf.get_default_graph(), config=session_conf)
+    K.set_session(sess)
+except AttributeError:
+    import tensorflow as _tf2
+    _tf2.random.set_seed(1)
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
@@ -197,11 +225,11 @@ class SubtypeGAN():
         if self.n > 1:
             sample_size = datasets[0].shape[0]
         print(sample_size)
-        if sample_size > 300:
-            self.epochs = 11
+        # Honor caller-provided epochs. Only auto-scale when left at the class default.
+        if epochs == 100:
+            self.epochs = 30 if sample_size <= 300 else 50
         else:
-            self.epochs = 10
-        self.epochs = 30 * batch_size
+            self.epochs = epochs
         self.shape = []
         self.weight = [0.3, 0.1, 0.1, 0.5]
         self.disc_w = 1e-4
@@ -215,7 +243,10 @@ class SubtypeGAN():
             loss.append('mse')
         loss.append('binary_crossentropy')
         self.decoder, self.disc = self.build_decoder_disc()
-        self.disc.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+        # Use separate Adam instances: sharing one optimizer across two compile() calls
+        # causes "Unknown variable" in Keras 3 because the optimizer tracks each model's
+        # variables independently.
+        self.disc.compile(loss='binary_crossentropy', optimizer=Adam(), metrics=['accuracy'])
         self.encoder = self.build_encoder()
         for i in range(self.n):
             input.append(Input(shape=(self.shape[i],)))
@@ -224,7 +255,7 @@ class SubtypeGAN():
         z_mean, z_log_var, z = self.encoder(input)
         output = self.decoder(z)
         self.gan = Model(input, output)
-        self.gan.compile(loss=loss, loss_weights=loss_weights, optimizer=optimizer)
+        self.gan.compile(loss=loss, loss_weights=loss_weights, optimizer=Adam())
         print(self.gan.summary())
         return
 
@@ -297,9 +328,16 @@ class SubtypeGAN():
                 #  Train Encoder_GAN
                 g_loss = self.gan.train_on_batch(data, outs)
             fp.close()
-            self.encoder.save(model_path)
+            # Keras 3 requires .keras or .h5 extension; append if missing
+            _save_path = model_path.rstrip('/')
+            if not (_save_path.endswith('.keras') or _save_path.endswith('.h5')):
+                _save_path += '.keras'
+            self.encoder.save(_save_path)
         else:
-            self.encoder = load_model(model_path)
+            _save_path = model_path.rstrip('/')
+            if not (_save_path.endswith('.keras') or _save_path.endswith('.h5')):
+                _save_path += '.keras'
+            self.encoder = load_model(_save_path)
         mat = self.encoder.predict(X_train)[0]
         return mat
 
@@ -388,46 +426,107 @@ class SubtypeGAN_API(object):
 def main(argv=sys.argv):
     parser = argparse.ArgumentParser(description='SubtypeGAN v1.0')
     parser.add_argument("-e", dest='epochs', type=int, default=200, help="Number of iterations")
-    parser.add_argument("-m", dest='run_mode', default="feature", help="run_mode: feature, cluster")
+    parser.add_argument("-m", dest='run_mode', default="SubtypeGAN", help="run_mode: SubtypeGAN, cc")
     parser.add_argument("-n", dest='cluster_num', type=int, default=-1, help="cluster number")
     parser.add_argument("-w", dest='disc_weight', type=float, default=1e-4, help="weight")
     parser.add_argument("-o", dest='output_path', default="./score/", help="file output")
-    parser.add_argument("-t", dest='type', default="ACC_Top", help="data type")
+    parser.add_argument("-t", dest='type', default="ACC_Top", help="data type (legacy, e.g. ACC_Top)")
+    # MLOmics-specific arguments
+    parser.add_argument("--dataset",   dest='dataset',   default=None,
+                        help="Dataset name (e.g. ACC). Overrides -t when combined with --version.")
+    parser.add_argument("--version",   dest='version',   default="Top",
+                        choices=["Top", "Original", "Aligned"],
+                        help="Data version: Top, Original, Aligned (default: Top)")
+    parser.add_argument("--data_path", dest='data_path', default=None,
+                        help="Root path to Clustering_datasets/ directory")
     args = parser.parse_args()
-    model_path = './model/' + args.type + '.h5'
+
+    # Resolve dataset / version / data_path
+    # If --dataset is provided, use it; otherwise fall back to legacy -t parsing
+    if args.dataset is not None:
+        dataset = args.dataset
+        version = args.version
+        # Build data_type string for backward-compat paths (e.g. fea/, model/)
+        data_type = dataset + "_" + version
+    else:
+        data_type = args.type
+        parts = data_type.split("_")
+        dataset = parts[0]
+        version = parts[1] if len(parts) > 1 else "Top"
+
+    # Suffix per version
+    suffix_map = {"Original": "", "Top": "_top", "Aligned": "_aligned"}
+    suffix = suffix_map.get(version, "_top")
+
+    model_path = './model/' + data_type + '.h5'
     SubtypeGAN = SubtypeGAN_API(model_path, epochs=args.epochs, weight=args.disc_weight)
     omics_types = ['CNV', 'Methy', 'mRNA', 'miRNA']
-    
+
     if args.run_mode == 'SubtypeGAN':
         print("Start SubTypeGAN...")
-        data_type = args.type
         if args.cluster_num == -1:
             print("Please set the number of clusters!")
         fea_tmp_file = './fea/' + data_type + '.fea'
         tmp_dir = './fea/' + data_type + '/'
         model_dir ='./model'
-        os.makedirs(tmp_dir, exist_ok=True) 
-        os.makedirs(model_dir, exist_ok=True) 
+        os.makedirs(tmp_dir, exist_ok=True)
+        os.makedirs(model_dir, exist_ok=True)
+        os.makedirs('./results', exist_ok=True)
         ldata = []
         l = []
 
-        dir_path = '../../../....//Main_Dataset/Clustering_datasets/' + data_type.replace('_', '/')
-        files = os.listdir(dir_path)
+        # Build path to the data directory.
+        # Preferred MLOmics layout: {data_path}/{dataset}/{version}/
+        # Fallback (legacy): {data_path}/{dataset}/
+        if args.data_path is not None:
+            dir_path_versioned = os.path.normpath(
+                os.path.join(args.data_path, dataset, version)
+            )
+            dir_path_flat = os.path.normpath(os.path.join(args.data_path, dataset))
+            if os.path.isdir(dir_path_versioned):
+                dir_path = dir_path_versioned
+            elif os.path.isdir(dir_path_flat):
+                dir_path = dir_path_flat
+            else:
+                print(f"Data directory not found: {dir_path_versioned}")
+                sys.exit(1)
+        else:
+            # Legacy fallback: derive from script location
+            dir_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                '..', '..', '..', '..', 'Main_Dataset', 'Clustering_datasets',
+                dataset, version
+            )
+            dir_path = os.path.normpath(dir_path)
+            if not os.path.isdir(dir_path):
+                print(f"Data directory not found: {dir_path}")
+                sys.exit(1)
+
         for omics in omics_types:
-            for file_name in files:
-                if omics in file_name and file_name.endswith('.csv') and not file_name.startswith('.'):
-                    file_path = os.path.join(dir_path, file_name)
-                    if os.path.isfile(file_path):
-                        print("Processing ", file_path)
-                        df_new = pd.read_csv(file_path, sep=',', header=0, index_col=0)
-                        l = list(df_new)
-                        df_new = df_new.T
-                        ldata.append(df_new.values.astype(float))
-                    else:
-                        print(f"File not found: {file_path}")
+            # Construct exact filename using dataset + omics + suffix
+            file_name = f"{dataset}_{omics}{suffix}.csv"
+            file_path = os.path.join(dir_path, file_name)
+            if os.path.isfile(file_path):
+                print("Processing ", file_path)
+                df_new = pd.read_csv(file_path, sep=',', header=0, index_col=0)
+                l = list(df_new.columns)
+                df_new = df_new.T  # transpose: features x samples -> samples x features
+                ldata.append(df_new.values.astype(float))
+            else:
+                print(f"File not found: {file_path}")
+
+        if len(ldata) == 0:
+            print(f"No omics files found under {dir_path}")
+            sys.exit(1)
+
+        # Clamp latent size to the smallest omics feature dimension
+        max_comp = max(2, min(arr.shape[1] for arr in ldata) - 1)
+        n_components = min(100, max_comp)
 
         start_time = time.time()
-        vec = SubtypeGAN.feature_gan(ldata, index=l, n_components=100, weight=args.disc_weight)
+        # feature_gan lives on SubtypeGAN_API, not SubtypeGAN
+        _api = SubtypeGAN_API(model_path, epochs=args.epochs, weight=args.disc_weight)
+        vec = _api.feature_gan(ldata, index=l, n_components=n_components, weight=args.disc_weight)
         df = pd.DataFrame(data=[time.time() - start_time])
         vec.to_csv(fea_tmp_file, header=True, index=True, sep='\t')
         out_file = './results/' + data_type + '.SubtypeGAN.time'
@@ -448,7 +547,7 @@ def main(argv=sys.argv):
         max_cluster = 8
         iteration = 10
 
-        data_type = args.type
+        # data_type is already resolved above (dataset + version)
         fea_tmp_file = './fea/' + data_type + '.fea'
         fs = []
         cc_file = './results/cluster_num.cc'

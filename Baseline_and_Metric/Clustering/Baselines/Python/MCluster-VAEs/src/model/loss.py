@@ -60,8 +60,8 @@ class MultiMSELossWithWGANLoss(MultiMSELoss):
         self._disc_ws = disc_ws
 
     def forward(self, xs, xs_, preds, targets=None):
-        # targets是用来占位的，这样WGAN就可以和正常的GAN共用一套
-        # batch_train_train_gen的代码
+        # targets is a placeholder so WGAN can share the same
+        # batch_train_train_gen code path as a regular GAN
         mse_loss, losses = super().forward(xs, xs_)
         adv_loss = 0.
         for i, pred in enumerate(preds):
@@ -178,10 +178,10 @@ def kl_between_y_and_uniform(logit):
     return (res * logp.exp()).sum(dim=1).mean()
 
 
-# 需要继承MultiMSE，不然调用forward调用的是VAELoss的forward
+# Must subclass MultiMSE; otherwise forward resolves to VAELoss.forward
 class VAEM2MeanFieldLoss(MultiMSELoss):
 
-    """ 如果使用Gumbel Softmax版本的M2，也是使用这个loss function """
+    """ Also used for the Gumbel-Softmax version of M2. """
 
     @staticmethod
     def vae_meanfield_reg_loss(logit, z_mu, z_logsigma2):
@@ -343,7 +343,7 @@ class MOVBCExactLoss(nn.Module):
         # 1. E_{Q(y,z1,z2|x1,x2)}(log P(x1,x2|y,z1,z2)), mse
         p = torch.softmax(logits, dim=1)
         mse = torch.zeros(logits.size(0), logits.size(1), len(xs)).to(logits)
-        # TODO: concat的效率是不是会比+更高？
+        # TODO: is concat more efficient than + ?
         for i, xs_ in enumerate(xs_rec):
             for j, (x, x_) in enumerate(zip(xs, xs_)):
                 mse[:, i, j] += (x - x_).pow(2).sum(dim=1)

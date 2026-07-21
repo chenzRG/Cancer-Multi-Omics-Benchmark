@@ -35,7 +35,7 @@ class TrainerBase(nn.Module):
     @property
     def learning_rate(self):
         if self._lr_sch:
-            return self._scheduler.get_last_lr()[0]  # 返回的是list
+            return self._scheduler.get_last_lr()[0]  # get_last_lr returns a list
         return self._lr
 
     @property
@@ -96,7 +96,7 @@ class TrainerBase(nn.Module):
 
             scores.update(clinical_metrics(preds, self._dat._meta))
 
-            # 计算entropy和conditional entropy
+            # Compute entropy and conditional entropy
             _, counts = np.unique(preds, return_counts=True)
             entr = entropy(counts, base=2)
             centr = conditional_entropy(probs)

@@ -1,7 +1,7 @@
 library(xgboost)
 library(rpart)
 
-setwd("/Users/daisyding/Desktop/2020_Spring/MDI_GNN/uci/data_with_missing/0.3/")
+# setwd("/path/to/data_with_missing/0.3/")  # set working directory before running
 
 datasets = c('concrete', 'energy', 'housing', 'kin8nm',
           'naval', 'power', 'protein', 'wine', 'yacht')
@@ -37,7 +37,7 @@ for (i in seq(datasets)){
   }
 }
 
-setwd("/Users/daisyding/Desktop/2020_Spring/MDI_GNN/uci/data_with_missing")
+# setwd("/path/to/data_with_missing")  # set working directory before running
 write.csv(mae_list_tree, "tree_0.3.txt")
 
 xgb_mae_average = apply(mae_list_xgb,1,mean)

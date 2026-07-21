@@ -1,15 +1,43 @@
-numpy>=1.18.2
-tensorflow==2.10.0
-keras>=2.3.1
-tqdm>=4.36.1
-argparse>=1.1
-matplotlib>=3.1.1
-pyqt5>=5.13.1
-scipy>=1.3.1
-fancyimpute
-seaborn
-torch
-torch_geometric
-gseapy
-statsmodels
-gdown
+# ──────────────────────────────────────────────
+# MLOmics — Python dependencies
+# Tested with Python 3.11
+# ──────────────────────────────────────────────
+
+# Core scientific stack
+# numpy is pinned: shap 0.40+ and pandas/TF have conflicting upper bounds;
+# 1.26.x is the last version compatible with both sides.
+numpy==1.26.4
+pandas>=2.0
+scipy>=1.10
+scikit-learn>=1.3
+
+# Visualisation
+matplotlib>=3.5
+seaborn>=0.12
+tqdm>=4.60
+
+# Deep learning — TensorFlow / Keras 3
+tensorflow>=2.16
+keras>=3.0
+
+# Deep learning — PyTorch
+torch>=2.0
+torch-geometric>=2.0
+
+# Baseline-specific
+xgboost>=1.7           # XGBoost / Classifiers
+fancyimpute>=0.7       # Mean / KNN / MICE / SVD / Spectral imputation
+lifelines>=0.27        # CustOmics survival analysis
+hydra-core>=1.3        # MCluster-VAEs config management
+omegaconf>=2.3         # MCluster-VAEs config management
+shap>=0.40             # XOmiVAE feature attribution
+
+# Downstream analysis tools
+gseapy                 # KEGG / pathway enrichment
+statsmodels            # Statistical tests
+gdown                  # Google Drive download helper
+
+# ──────────────────────────────────────────────
+# Note: MAUI must be installed separately from source:
+#   pip install git+https://github.com/BIMSBbioinfo/maui.git
+# ──────────────────────────────────────────────

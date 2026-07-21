@@ -57,7 +57,7 @@ for (i in 1:simN) {
                                   mu = rep(0, times = group_sizes[i]),
                                   Sigma = group_cov[[i]]))
   X_mat <- do.call(cbind, X)
-  write.csv(X_mat, "/Users/daisyding/Dropbox/StarterCode/simulated_data.csv")
+  write.csv(X_mat, "simulated_data.csv")
   
   ##############
   # Generate y #

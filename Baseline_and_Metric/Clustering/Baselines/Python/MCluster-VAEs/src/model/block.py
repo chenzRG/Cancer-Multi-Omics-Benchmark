@@ -85,7 +85,7 @@ class MLP(nn.Module):
         bias: bool = True
     ) -> None:
         if side_out is not None:
-            # side_out只可能是MLP隐层的输出
+            # side_out can only be an MLP hidden-layer output
             assert side_out >= 0 and side_out < len(hiddens)
         if n_out is None and len(hiddens) == 0:
             raise ValueError("MLP dosen't have hidden layers.")
@@ -106,7 +106,7 @@ class MLP(nn.Module):
         self.layers = nn.ModuleList()
         if self.first_bn:
             self.first_bn_layer = nn.BatchNorm1d(n_in)
-        # 如果hiddens不为[]，则首先得到其中的hidden layers
+        # If hiddens is non-empty, build those hidden layers first
         if len(self.hiddens) > 0:
             for ind, (i, o) in enumerate(zip(
                 [n_in] + self.hiddens[:-1], self.hiddens
@@ -115,8 +115,8 @@ class MLP(nn.Module):
                     i+cov_dim*self.inject_into_layer(ind),
                     o, act, bn, dp, bias
                 ))
-        # 如果hiddens为[]，则只有linear(in->out)；否则则得到out layer。
-        # 并在后面添加out dropout layer
+        # If hiddens is empty, only linear(in->out); otherwise add an out layer
+        # and an output dropout layer
         last_layer = []
         if len(self.hiddens) == 0:
             last_layer.append(nn.Linear(n_in + cov_dim, n_out, bias))
@@ -357,7 +357,7 @@ class MultiEncoder(DistributionNN):
     ):
         assert set(omic_n_in) == set(omic_hiddens) == set(omic_n_latents)
         if att_method != "none" and isinstance(omic_n_latents, dict):
-            # 如果不是none，需要保证每个head的输出都是一样的
+            # If not none, every head must produce the same output size
             assert len(set(omic_n_latents.values())) == 1
 
         super().__init__(distribution, var_eps, scale_activation, **kwargs)
@@ -424,7 +424,7 @@ class MultiEncoder(DistributionNN):
 
     def forward(self, **x):
         hs = []
-        # ModuleDict是ordered dict，所以不用担心其顺序
+        # ModuleDict is ordered, so key order is stable
         for k, layer in self.omic_heads.items():
             hs.append(layer(x[k]))
         if self.att_method == "none":
@@ -448,7 +448,7 @@ class MultiEncoder(DistributionNN):
 
     def get_latent(self, **x):
         hs = []
-        # ModuleDict是ordered dict，所以不用担心其顺序
+        # ModuleDict is ordered, so key order is stable
         for k, layer in self.omic_heads.items():
             hs.append(layer(x[k]))
         if self.att_method == "none":
@@ -465,7 +465,7 @@ class MultiEncoder(DistributionNN):
             last_mlp = self.global_net[2]
         else:
             last_mlp = self.global_net[0]
-        # global net没有first_bn，所以，舍弃此步
+        # global net has no first_bn, so skip this step
         if len(last_mlp.layers) == 1:
             return latent
         for m in last_mlp.layers[:-1]:

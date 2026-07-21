@@ -24,27 +24,27 @@ def main(cfg: DictConfig):
         torch.backends.cudnn.benchmark = True
 
     if cfg.cv is None:
-        # 1. 准备数据集
+        # 1. Load datasets
         print("1. load datasets ... ")
         data_things = next(step_data(cfg))
         dat = data_things["dat"]
         nc = data_things["nc"]
 
-        # 2. 构建模型
+        # 2. Build model
         print("2. construct model ... ")
         model = step_model(cfg, dat, nc)
 
-        # 3. 训练模型
+        # 3. Train model
         print("3. train model ... ")
         trained_model = step_train(cfg, dat, model)
 
-        # 4. 评价及保存模型
+        # 4. Evaluate and save model
         print("4. save results ... ")
         step_save(cfg, dat, trained_model)
 
-        # 5. return score，用于hydra-optuna使用
-        #   但实际上能够使用的程度比较有限，因为我的参数中有一些是以list或dict为参数，
-        #   这些hydra-optuna-plugin难以处理
+        # 5. Return score for hydra-optuna
+        #   Limited usefulness in practice because some parameters are lists/dicts,
+        #   which hydra-optuna-plugin cannot handle well
         scores = trained_model.scores
         if "survival" in scores:
             return scores["survival"]
@@ -53,12 +53,12 @@ def main(cfg: DictConfig):
         else:
             raise ValueError
     else:
-        # 是否对分割后剩下的测试集进行测试？只对PAN进行
+        # Evaluate held-out test split? Only for PAN
         test_test = cfg.dataset.dat_name == "PAN"
         all_scores = []
         root_ori = os.getcwd()
 
-        # 1. 准备数据集
+        # 1. Load datasets
         print("1. load datasets ... ")
         for i, data_things in enumerate(step_data(cfg)):
             root_i = os.path.join(root_ori, str(i+1))
@@ -69,11 +69,11 @@ def main(cfg: DictConfig):
             tedat = data_things["tedat"]
             nc = data_things["nc"]
 
-            # 2. 构建模型
+            # 2. Build model
             print("2-%d. construct model ... " % (i+1))
             model = step_model(cfg, trdat, nc)
 
-            # 3. 训练模型
+            # 3. Train model
             print("3-%d. train model ... " % (i+1))
             try:
                 trained_model = step_train(cfg, trdat, model)
@@ -81,7 +81,7 @@ def main(cfg: DictConfig):
                 print("3-%d, model collapse at epoch %d !" % ((i+1), e.epoch))
                 continue
 
-            # 4. 评价及保存模型
+            # 4. Evaluate and save model
             print("4-%d. save results ... " % (i+1))
             if test_test:
                 scores = step_save(cfg, tedat, trained_model, eval=True)
@@ -90,10 +90,10 @@ def main(cfg: DictConfig):
 
             all_scores.append(scores)
 
-        # 5. return score，用于hydra-optuna使用
-        #   但实际上能够使用的程度比较有限，
-        #   因为我的参数中有一些是以list或dict为参数的，
-        #   这些hydra-optuna-plugin难以处理
+        # 5. Return score for hydra-optuna
+        #   Limited usefulness in practice,
+        #   because some parameters are lists/dicts,
+        #   which hydra-optuna-plugin cannot handle well
         # scores = trained_model.scores
         if "survival" in scores:
             all_scores_df = pd.DataFrame.from_records(all_scores)

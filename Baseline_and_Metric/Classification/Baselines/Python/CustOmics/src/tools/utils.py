@@ -29,6 +29,36 @@ def get_sub_omics_df(omics_df, lt_samples):
     return {key: value.loc[lt_samples, :] for key, value in omics_df.items()}
 
 
+# MLOmics: unified loader for GS classification datasets
+def read_data_mlomics(dataset, version='Top', data_root=None):
+    """
+    Load a GS-* classification dataset from MLOmics Main_Dataset.
+    Returns (omics_df, labels_array) compatible with CustOmics.
+
+    omics_df: dict {name: DataFrame(samples × features)}
+    labels:   np.ndarray of int class labels
+
+    Usage:
+        omics_df, labels = read_data_mlomics('GS-BRCA', version='Top',
+            data_root='/path/to/Main_Dataset')
+    """
+    import sys, os as _os
+    _proj_root = _os.path.abspath(_os.path.join(_os.path.dirname(__file__), '..', '..', '..', '..', '..', '..', '..'))
+    if _proj_root not in sys.path:
+        sys.path.insert(0, _proj_root)
+    from utils.data_loader import MLOmicsLoader
+    _root = data_root or _os.environ.get('MLOMICS_DATA_ROOT', '')
+    # Accept either Main_Dataset/ or Main_Dataset/Classification_datasets/
+    if _root and _os.path.basename(_os.path.normpath(_root)) == 'Classification_datasets':
+        _root = _os.path.dirname(_os.path.normpath(_root))
+    loader = MLOmicsLoader(_root)
+    raw = loader.load_omics(dataset, version=version)
+    # CustOmics expects samples × features DataFrames
+    omics_df = {k: df.T for k, df in raw.items()}
+    labels = loader.load_labels(dataset, version=version)
+    return omics_df, labels
+
+
 def read_data(cohort, omic_sources, label):
     omics_df = {}
     cnv_path = '../TCGA/{}/Omics/CNV/{}.gistic.tsv'.format(cohort,cohort)
@@ -132,16 +162,16 @@ def extract_tumour_type(data):
 #######
 
 
-def save_splits(lt_samples, cohort):
+def save_splits(lt_samples, cohort, split_root='splits'):
     kf = KFold(n_splits=5)
     for i, (train_index, test_index) in enumerate(kf.split(lt_samples)):
         train_index, val_index = train_test_split(train_index, test_size=0.15)
         samples_train = [lt_samples[i] for i in train_index]
         samples_val = [lt_samples[i] for i in val_index]
         samples_test = [lt_samples[i] for i in test_index]
-        split_dir = 'splits/{}/'.format(cohort)
+        split_dir = os.path.join(split_root, cohort) + os.sep
         if not os.path.isdir(split_dir):
-            os.mkdir(split_dir)
+            os.makedirs(split_dir, exist_ok=True)
         with open(split_dir + 'split_train_{}.txt'.format(i+1), 'w+') as split_file:
             for sample in samples_train:
                 split_file.write(sample + '\n')
@@ -152,8 +182,8 @@ def save_splits(lt_samples, cohort):
             for sample in samples_test:
                 split_file.write(sample + '\n')
 
-def get_splits(cohort, split):
-    split_dir = 'splits/{}/'.format(cohort)
+def get_splits(cohort, split, split_root='splits'):
+    split_dir = os.path.join(split_root, cohort) + os.sep
     with open(split_dir + 'split_train_{}.txt'.format(split), 'r') as split_file:
         samples_train = [sample.rstrip() for sample in split_file.readlines()]
     with open(split_dir + 'split_val_{}.txt'.format(split), 'r') as split_file:
@@ -194,7 +224,10 @@ def fashion_scatter(x, colors):
     return f, ax, sc, txts
 
 def save_plot_score(filename, z, y, title, show=False):
-    tsne = TSNE(n_components=2, verbose=0, perplexity=40, n_iter=300)
+    n_samples = z.shape[0]
+    # perplexity must be < n_samples; keep a stable default when possible
+    perplexity = min(40, max(2, n_samples - 1))
+    tsne = TSNE(n_components=2, verbose=0, perplexity=perplexity, max_iter=300)
     tsne_embed = tsne.fit_transform(z)
     df = pd.DataFrame()
     df['targets'] = y

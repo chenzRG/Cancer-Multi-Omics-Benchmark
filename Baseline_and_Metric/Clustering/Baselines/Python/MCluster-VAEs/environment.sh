@@ -9,5 +9,5 @@ conda install numpy pandas matplotlib seaborn tqdm scikit-learn -c conda-forge -
 conda install lifelines optuna -c conda-forge -y
 conda install flake8 ipdb jupyterlab tensorboard -c conda-forge -y
 
-# pip的版本更高
+# Prefer a newer pip
 pip install hydra-core

@@ -1,6 +1,8 @@
 import argparse
 import torch
 
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np
 
 from src.tools.core_utils import train
@@ -8,6 +10,7 @@ from src.tools.core_utils import train
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-c', '--cohorts', help='list of cohorts to process', type=str)
+parser.add_argument('--version', help='feature version: Top, Original, Aligned', type=str, default='Top')
 parser.add_argument('-dv', '--device', help='torch device in which the computations will be done', type=str, default='cpu')
 parser.add_argument('-dr', '--data_directory', help='folder in which the data are stored', type=str, default='../TCGA/')
 parser.add_argument('-res', '--result_directory', help='folder in which the results should be stored', type=str, default='results/')
@@ -19,8 +22,8 @@ parser.add_argument('-nc', '--num_classes', help='number of classes for the clas
 parser.add_argument('-b', '--batch_size', help='batch size for the data loader', type=int, default=32)
 parser.add_argument('-e', '--epochs', help='number of training epochs', type=int, default=20)
 parser.add_argument('-p2', '--p2_switch', help='epoch to switch to phase 2', type=int, default=10)
-parser.add_argument('-lr', '--lr', help='learning rate for the training optimizer', type=int, default=1e-3)
-parser.add_argument('-bt', '--beta', help='value of the regulation coefficient for the beta-VAE', type=int, default=1)
+parser.add_argument('-lr', '--lr', help='learning rate for the training optimizer', type=float, default=1e-3)
+parser.add_argument('-bt', '--beta', help='value of the regulation coefficient for the beta-VAE', type=float, default=1)
 parser.add_argument('-dp', '--dropout', help='dropout rate', type=float, default=0.2)
 
 
@@ -54,11 +57,26 @@ survival_dim = [int(element) for element in args.survival_dim.split(',')]
 if __name__ == "__main__":
     lt_metrics = []
     for split in range(1, 6):
-        metric = train(args.task, args.cohorts, sources, split, device, num_classes=args.num_classes,
-             batch_size=args.batch_size, n_epochs=args.epochs, beta=args.beta, lr=args.lr,
-            hidden_dim=hidden_dim, central_dim=central_dim, latent_dim=args.latent_dim, dropout=args.dropout,
-            classifier_dim=classifier_dim, survival_dim=survival_dim, lambda_classif=args.lambda_classif, 
-            lambda_survival=args.lambda_survival, explain=args.explain, explained_source=args.explained_source, explained_class=args.explained_class)
+        metric = train(
+            args.task, args.cohorts, sources, split, device, num_classes=args.num_classes,
+            batch_size=args.batch_size, n_epochs=args.epochs, beta=args.beta, lr=args.lr,
+            hidden_dim=hidden_dim, central_dim=central_dim, latent_dim=args.latent_dim,
+            dropout=args.dropout, classifier_dim=classifier_dim, survival_dim=survival_dim,
+            lambda_classif=args.lambda_classif, lambda_survival=args.lambda_survival,
+            explain=args.explain, explained_source=args.explained_source,
+            explained_class=args.explained_class, data_root=args.data_directory,
+            version=args.version, result_directory=args.result_directory,
+            p2_switch=args.p2_switch,
+        )
         lt_metrics.append(metric)
         print(metric)
-    print('C-index : {} +- {}'.format(np.mean(lt_metrics), np.std(lt_metrics)))
+    numeric = []
+    for m in lt_metrics:
+        if isinstance(m, (int, float, np.floating)):
+            numeric.append(float(m))
+        elif isinstance(m, list) and m and isinstance(m[0], dict) and 'Accuracy' in m[0]:
+            numeric.append(float(m[0]['Accuracy']))
+    if numeric:
+        print('Score : {} +- {}'.format(np.mean(numeric), np.std(numeric)))
+    else:
+        print('Metrics:', lt_metrics)

@@ -33,7 +33,7 @@ CLINICAL_VARS = [
 ]
 
 
-""" 工具函数，用于将hydra的config载入展开成dict """
+""" Flatten a Hydra config into a plain dict. """
 
 
 def _explore_recursive(res_dict, parent_name, element):
@@ -55,13 +55,13 @@ def unfold_config(params):
     return res_dict
 
 
-""" 将整个机器学习过程拆分成多个过程，便于复用 """
+""" Split the ML pipeline into reusable steps. """
 
 
 def step_data(cfg):
     data_args = cfg.dataset
     nc = None
-    # 需要注意，在合并完成后一定要再把无信息特征去掉，否则后面进行标准化时会报错
+    # After merging, drop clinical features; otherwise later normalization fails
     if data_args.dat_name == "simulation":
         simulator = SimulatorMorgane(cfg.seed)
         Xd, y, _, nc = simulator.get_data(data_args.data_index,
@@ -114,11 +114,20 @@ def step_model(cfg, dat, nc):
     model_args = cfg.model
     model_dict = OmegaConf.to_container(model_args)
     model_dict["n_clusters"] = nc
-    # -- 用来描绘数据分布的设置在dataset中，为了便于管理
-    if OmegaConf.is_dict(cfg.dataset.omic_dist_kind):
+    # Remap legacy omic dict keys (rna/CN/meth) onto current dat.dims keys when needed
+    omic_keys = list(dat.dims.keys())
+    for field in ("omic_n_latents", "omic_cls_latents", "omic_cls_hiddens",
+                  "omic_enc_hiddens", "omic_dec_hiddens"):
+        val = model_dict.get(field)
+        if isinstance(val, dict) and any(k not in omic_keys for k in val.keys()):
+            # MClusterVAEs expands non-dict values across all omic keys
+            model_dict[field] = next(iter(val.values()))
+
+    # Data-distribution settings live under dataset for easier management
+    if OmegaConf.is_dict(cfg.dataset.get("omic_dist_kind", None)):
         model_dict["omic_dist_kind"] = \
             OmegaConf.to_container(cfg.dataset.omic_dist_kind)
-    else:
+    elif cfg.dataset.get("omic_dist_kind", None) is not None:
         model_dict["omic_dist_kind"] = cfg.dataset.omic_dist_kind
     model = M.MClusterVAEs(omic_n_in=dat.dims, **model_dict)
     return model
@@ -127,42 +136,42 @@ def step_model(cfg, dat, nc):
 def step_train(cfg, dat, model, use_tb=True, callback=None):
     train_args = cfg.train
     train_dict = OmegaConf.to_container(train_args)
-    # -- 这里将tensorboard summary writer 放在外面，这样我们就可以将hparams
-    #   加入到tensorboard中。这是因为hparams需要从cfg中得到，如果summary writer
-    #   整个都在model内部，则cfg必须作为参数传入，这是非常不优雅的，也和当前的代码
-    #   风格不协调。
-    #   但是这里我依然保持了tensorboard参数接受path的能力，此时其在内部创建一个
-    #   summarywriter，并在训练结束后close。
+    # Keep the TensorBoard SummaryWriter outside the model so hparams
+    #   can be logged from cfg. If the writer lived entirely inside the model,
+    #   cfg would have to be passed in, which is awkward and inconsistent
+    #   with the current code style.
+    #   Still allow tensorboard=path: in that case a writer is created inside
+    #   and closed after training.
     tb = train_dict.pop("tensorboard")
     if use_tb and tb is not None:
         if tb.startswith("_"):
             if tb == "_datname":
                 tb = cfg.dataset.dat_name
             else:
-                raise NotImplementedError("现在tensorboard dir只能使用_datname")
+                raise NotImplementedError("tensorboard dir currently only supports _datname")
 
         with NewSummaryWriter(tb, flush_secs=1) as writer:
             model.fit(dat=dat, tensorboard=writer, **train_dict)
-            # -- 加入hparams
+            # -- Log hparams
             hparam_dict = unfold_config(cfg)
             writer.add_hparams(
                 hparam_dict, {"hparam/"+k: v for k, v in model.scores.items()}
             )
     else:
         model.fit(dat=dat, callback=callback, **train_dict)
-    # -- 打印一下最终结果
+    # -- Print final results
     msg = ", ".join("%s: %.4f" % (k, v) for k, v in model.scores.items())
     print(msg)
 
-    # --在单个process中循环重复多次建立模型，会导致速度越来越慢，通过以下命令
-    #   周期性地清除临时变量，期望能够提高速度
+    # -- Repeated model builds in one process slow down over time; periodically
+    #   clear temporaries to keep speed stable
     # torch.cuda.empty_cache()
 
     return model
 
 
 def step_save(cfg, dat, trained_model, save_dir="", suffix="", eval=False):
-    """ 默认为''，即在当前目录下 """
+    """ Default is empty string (current directory). """
     model_fn, train_fn, valid_fn, eval_fn, clus_fn, embed_fn, metr_fn = [
         os.path.join(save_dir, fn % suffix)
         for fn in [
@@ -220,7 +229,7 @@ def evaluate(pred_probs, labels):
     scores = {"n_clusters": n_clusters}
     scores.update(cluster_metrics(labels, preds))
 
-    # 计算entropy和conditional entropy
+    # Compute entropy and conditional entropy
     _, counts = np.unique(preds, return_counts=True)
     entr = entropy(counts, base=2)
     centr = conditional_entropy(pred_probs)
