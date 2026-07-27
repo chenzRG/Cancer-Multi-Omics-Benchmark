@@ -53,6 +53,7 @@ flowchart TD
 - [Benchmark Tasks](#benchmark-tasks)
 - [Performance Leaderboards](#performance-leaderboards)
 - [Resources](#resources)
+- [Contact](#contact)
 - [Citation](#citation)
 
 ---
@@ -355,6 +356,12 @@ Mean [11], KNN [12], MICE [13], Iterative SVD [14], Spectral [15], GRAPE [16], G
 - [Hugging Face dataset](https://huggingface.co/datasets/AIBIC/MLOmics)
 - Documentation: this README + `scripts/` runners + `utils/data_loader.py`
 - Citation: see below
+
+---
+
+## Contact
+
+For questions about the MLOmics database, please contact [yang.ziwei.5k@ms.c.kyoto-u.ac.jp](mailto:yang.ziwei.5k@ms.c.kyoto-u.ac.jp).
 
 ---
 
