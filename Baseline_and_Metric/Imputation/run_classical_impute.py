@@ -30,9 +30,15 @@ def main():
     from sklearn.metrics import mean_absolute_error
     from fancyimpute import SimpleFill, KNN, IterativeImputer, IterativeSVD, SoftImpute
 
-    # Load data
+    # Load data — accept Main_Dataset or Imputation_datasets root
+    data_path = args.data_path
+    if os.path.basename(data_path) == 'Main_Dataset':
+        data_path = os.path.join(data_path, 'Imputation_datasets')
+    elif os.path.isdir(os.path.join(data_path, 'Imputation_datasets')):
+        data_path = os.path.join(data_path, 'Imputation_datasets')
+
     cancer = args.dataset.replace('Imp-', '')
-    fpath  = os.path.join(args.data_path, args.dataset, 'Top',
+    fpath  = os.path.join(data_path, args.dataset, 'Top',
                           f'{cancer}_{args.omics}.csv')
     if not os.path.exists(fpath):
         raise FileNotFoundError(f'Data file not found: {fpath}')

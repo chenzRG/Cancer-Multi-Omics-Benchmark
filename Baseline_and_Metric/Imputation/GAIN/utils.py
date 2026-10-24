@@ -204,6 +204,9 @@ def sample_batch_index(total, batch_size):
   Returns:
     - batch_idx: batch index
   '''
+  if total < 1:
+    raise ValueError('total must be >= 1')
+  batch_size = min(int(batch_size), int(total))
   total_idx = np.random.permutation(total)
   batch_idx = total_idx[:batch_size]
   return batch_idx
