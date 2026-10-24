@@ -12,7 +12,7 @@
 #   --dataset   GS-BRCA | GS-COAD | GS-GBM | GS-LGG | GS-OV | Pan-cancer
 #   --version   Original | Top | Aligned  (default: Top)
 #   --method    Baseline name (default: XGBoost)
-#   --data_root Path to Main_Dataset dir (default: reads MLOmics Local Data.md or env var)
+#   --data_root Path to Main_Dataset dir (default: env MLOMICS_DATA_ROOT or ./Main_Dataset)
 
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -23,6 +23,7 @@ DATASET="GS-BRCA"
 VERSION="Top"
 METHOD="XGBoost"
 DATA_ROOT="${MLOMICS_DATA_ROOT:-$PROJECT_ROOT/Main_Dataset}"
+OUTPUT_DIR="$PROJECT_ROOT/results/classification"
 
 # ---------- parse args ----------
 while [[ $# -gt 0 ]]; do
@@ -43,84 +44,70 @@ echo "  Method  : $METHOD"
 echo "  Data    : $DATA_ROOT"
 echo "======================================"
 
+if [[ ! -d "$DATA_ROOT" ]]; then
+  echo "Error: data root not found: $DATA_ROOT"
+  echo "Run ./download.sh first (or set --data_root / MLOMICS_DATA_ROOT)."
+  exit 1
+fi
+
 export MLOMICS_DATA_ROOT="$DATA_ROOT"
 BASELINES_ROOT="$PROJECT_ROOT/Baseline_and_Metric/Classification/Baselines/Python"
+mkdir -p "$OUTPUT_DIR"
 
 case "$METHOD" in
 
   XGBoost|SVM|RF|LR)
-    NB="$BASELINES_ROOT/XGBoost_ SVM_RF_LR/XGBoost_ SVM_RF_LR.ipynb"
-    echo "Running $METHOD via Jupyter notebook..."
-    cd "$BASELINES_ROOT/XGBoost_ SVM_RF_LR"
-    jupyter nbconvert --to notebook --execute --inplace \
-      --ExecutePreprocessor.timeout=600 \
-      "XGBoost_ SVM_RF_LR.ipynb" \
-      2>&1 | tail -5
-    echo "Done. Output notebook in place."
+    echo "Running $METHOD via run_classifiers.py..."
+    python3 "$BASELINES_ROOT/XGBoost_SVM_RF_LR/run_classifiers.py" \
+      --dataset "$DATASET" \
+      --version "$VERSION" \
+      --data_path "$DATA_ROOT" \
+      --output_dir "$OUTPUT_DIR" \
+      --method "$METHOD"
     ;;
 
   MAUI)
-    echo "Running MAUI vignette..."
-    cd "$BASELINES_ROOT/MAUI"
-    python -c "
-import sys; sys.path.insert(0, '$PROJECT_ROOT')
-from utils.data_loader import MLOmicsLoader
-loader = MLOmicsLoader('$DATA_ROOT')
-omics = loader.load_omics('$DATASET', version='$VERSION')
-y     = loader.load_labels('$DATASET', version='$VERSION')
-print('Loaded:', {k: v.shape for k, v in omics.items()})
-from maui import Maui
-maui_model = Maui(n_hidden=[900], n_latent=70, epochs=10)
-maui_model.fit(omics)
-z = maui_model.transform(omics)
-print('Latent factors:', z.shape)
-print('MAUI test run complete.')
-"
+    echo "Running MAUI via run_maui.py..."
+    if ! python3 -c "import maui" 2>/dev/null; then
+      echo "Error: MAUI is not installed."
+      echo "Install with: pip install git+https://github.com/BIMSBbioinfo/maui.git"
+      echo "(See notes in requirements.txt.)"
+      exit 1
+    fi
+    python3 "$BASELINES_ROOT/MAUI/run_maui.py" \
+      --dataset "$DATASET" \
+      --version "$VERSION" \
+      --data_path "$DATA_ROOT" \
+      --output_dir "$OUTPUT_DIR"
     ;;
 
   XOmiVAE)
-    echo "Running XOmiVAE..."
-    cd "$BASELINES_ROOT/XOmiVAE"
-    python -c "
-import sys; sys.path.insert(0, '$PROJECT_ROOT')
-from generalHelperFunctions import loadData_mlomics
-class_num, labels, samples, omics = loadData_mlomics('$DATASET', version='$VERSION', data_root='$DATA_ROOT')
-print(f'Dataset: $DATASET/$VERSION | classes={class_num} | samples={len(samples)}')
-for k, arr in omics.items():
-    print(f'  {k}: {arr.shape}')
-print('XOmiVAE data loading OK.')
-"
+    echo "Running XOmiVAE via run_xomivae.py..."
+    python3 "$BASELINES_ROOT/XOmiVAE/run_xomivae.py" \
+      --dataset "$DATASET" \
+      --version "$VERSION" \
+      --data_path "$DATA_ROOT" \
+      --output_dir "$OUTPUT_DIR"
     ;;
 
   DCAP)
-    echo "Running DCAP (requires R preprocessing first)..."
-    cd "$BASELINES_ROOT/DCAP"
-    CANCER="${DATASET#GS-}"
-    INPUT_CSV="$DATA_ROOT/Classification_datasets/$DATASET/$VERSION/${CANCER}_mRNA_${VERSION,,}.csv"
-    OUTPUT_CSV="/tmp/dcap_preprocessed.csv"
-    echo "  Step 1: R preprocessing..."
-    Rscript Data_preprocessing.R "$DATA_ROOT/Classification_datasets/$DATASET/$VERSION" \
-      "${CANCER}_mRNA_${VERSION,,}.csv" \
-      "$OUTPUT_CSV"
-    echo "  Step 2: Python autoencoder..."
-    python autoencoder_DCAP.py --data_path "$OUTPUT_CSV" --output_path /tmp/dcap_output.csv
-    echo "DCAP run complete."
+    echo "Running DCAP via run_dcap.py..."
+    python3 "$BASELINES_ROOT/DCAP/run_dcap.py" \
+      --dataset "$DATASET" \
+      --version "$VERSION" \
+      --data_path "$DATA_ROOT" \
+      --output_dir "$OUTPUT_DIR"
     ;;
 
   CustOmics)
-    echo "Running CustOmics data loading test..."
-    cd "$BASELINES_ROOT/CustOmics"
-    python -c "
-import sys; sys.path.insert(0, '$PROJECT_ROOT')
-sys.path.insert(0, 'src')
-from src.tools.utils import read_data_mlomics
-omics, labels = read_data_mlomics('$DATASET', version='$VERSION', data_root='$DATA_ROOT')
-print('CustOmics loaded:')
-for k, df in omics.items():
-    print(f'  {k}: {df.shape}')
-print(f'  labels: {labels.shape}')
-print('CustOmics data loading OK.')
-"
+    echo "Running CustOmics via main.py..."
+    python3 "$BASELINES_ROOT/CustOmics/main.py" \
+      --cohorts "$DATASET" \
+      --version "$VERSION" \
+      --data_directory "$DATA_ROOT" \
+      --result_directory "$OUTPUT_DIR" \
+      --task classification \
+      --sources mRNA,miRNA,CNV,Methy
     ;;
 
   *)

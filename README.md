@@ -78,7 +78,7 @@ pip install -r requirements.txt
 
 ## Quick Start
 
-Run your first benchmark in under one minute (lightweight classical baseline):
+After `./download.sh` (so `Main_Dataset/` exists), run a classical baseline. With data already on disk, XGBoost typically finishes in under one minute (no Jupyter required):
 
 ```bash
 ./scripts/run_classification.sh \
@@ -86,6 +86,9 @@ Run your first benchmark in under one minute (lightweight classical baseline):
   --version Top \
   --method XGBoost
 ```
+
+Supported classification `--method` values: `XGBoost`, `SVM`, `RF`, `LR`, `MAUI`, `XOmiVAE`, `DCAP`, `CustOmics`.  
+(MAUI requires a separate install: `pip install git+https://github.com/BIMSBbioinfo/maui.git` — see `requirements.txt`.)
 
 Unified interface for other tasks:
 
@@ -97,7 +100,10 @@ Unified interface for other tasks:
 |------|---------|
 | Classification | `./scripts/run_classification.sh --dataset GS-BRCA --version Top --method XGBoost` |
 | Clustering | `./scripts/run_clustering.sh --dataset ACC --version Top --method SNF --k 3` |
-| Imputation | `./scripts/run_imputation.sh --dataset Imp-BRCA --omics mRNA --method GAIN --missing 0.3` |
+| Imputation | `./scripts/run_imputation.sh --dataset Imp-BRCA --omics mRNA --method Mean --missing 0.3` |
+
+Supported imputation `--method` values: `Mean`, `KNN`, `MICE`, `SVD`, `Spectral`, `GAIN`, `GRAPE`.  
+GAIN defaults to 100 iterations (`--iterations` to override); batch size is clamped to `min(128, n_rows)`.
 
 Direct model scripts also work under `scripts/Classification`, `scripts/Clustering`, and `scripts/Imputation`.
 

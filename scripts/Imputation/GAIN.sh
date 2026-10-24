@@ -1,25 +1,37 @@
 #!/bin/bash
+# Run GAIN on an MLOmics imputation matrix.
+# Usage: ./GAIN.sh [CANCER] [OMICS] [MISS_RATE]
+# Example: ./GAIN.sh BRCA mRNA 0.3
 
-# Save the current directory
-current_dir=$(pwd)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-# Navigate to the specific folder
-cd ../../Baseline_and_Metric/Imputation/GAIN
+arg1=${1:-"BRCA"}
+arg2=${2:-"mRNA"}
+arg3=${3:-0.3}
 
-# Parse arguments
-arg1=${1:-"BRCA"}  
-arg2=${2:-"CNV"}   
-arg3=${3:-0.7}     
-
-# Build data_name
 data_name="${arg1}_${arg2}"
 miss_rate="$arg3"
+data_file="$ROOT_DIR/Main_Dataset/Imputation_datasets/Imp-${arg1}/Top/${arg1}_${arg2}.csv"
 
-# Define the output file
-output_file="$current_dir/GAIN.txt"
+if [[ ! -f "$data_file" ]]; then
+  echo "Error: data file not found: $data_file"
+  exit 1
+fi
 
-# Run all commands and append their output to the output file
-python3 main_letter_spam.py --data_name "$data_name" --miss_rate "$miss_rate" --batch_size 128 --hint_rate 0.9 --alpha 100 --iterations 100 >> "$output_file"
+# batch = min(128, n_rows); iterations match unified runner default (100)
+read -r eff_batch <<EOF
+$(python3 -c "import pandas as pd; n=pd.read_csv(r'''$data_file''', index_col=0).shape[0]; print(max(1, min(128, int(n))))")
+EOF
 
-# Navigate back to the original directory
-cd "$current_dir"
+cd "$ROOT_DIR/Baseline_and_Metric/Imputation/GAIN"
+output_file="$SCRIPT_DIR/GAIN.txt"
+python3 main_letter_spam.py \
+  --data_name "$data_name" \
+  --data_path "$data_file" \
+  --miss_rate "$miss_rate" \
+  --batch_size "$eff_batch" \
+  --hint_rate 0.9 \
+  --alpha 100 \
+  --iterations 100 \
+  | tee -a "$output_file"

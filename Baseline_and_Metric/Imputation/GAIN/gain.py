@@ -59,6 +59,9 @@ def gain (data_x, gain_parameters):
   
   # Other parameters
   no, dim = data_x.shape
+  # Clamp batch size so mini-batches never exceed the number of rows
+  # (MLOmics CSVs / small slices can have n < default batch_size=128).
+  batch_size = max(1, min(int(batch_size), int(no)))
   
   # Hidden state dimensions
   h_dim = int(dim)
@@ -155,14 +158,15 @@ def gain (data_x, gain_parameters):
   # Start Iterations
   for it in tqdm(range(iterations)):    
       
-    # Sample batch
+    # Sample batch (length may be < requested batch_size when n is small)
     batch_idx = sample_batch_index(no, batch_size)
+    actual_bs = len(batch_idx)
     X_mb = norm_data_x[batch_idx, :]  
     M_mb = data_m[batch_idx, :]  
     # Sample random vectors  
-    Z_mb = uniform_sampler(0, 0.01, batch_size, dim) 
+    Z_mb = uniform_sampler(0, 0.01, actual_bs, dim) 
     # Sample hint vectors
-    H_mb_temp = binary_sampler(hint_rate, batch_size, dim)
+    H_mb_temp = binary_sampler(hint_rate, actual_bs, dim)
     H_mb = M_mb * H_mb_temp
       
     # Combine random vectors with observed vectors
